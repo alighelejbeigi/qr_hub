@@ -11,7 +11,7 @@ import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
   RxInt selectedIndex = 2.obs;
-
+  RxBool isFlashOn = false.obs;
   final pages = [
     const Center(child: Text('history Page')),
     const Center(child: Text('Generate Page')),
@@ -49,6 +49,29 @@ class HomePageController extends GetxController {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
         qrCodeResult.value = 'دوربینی در دسترس نیست.';
+      }
+    } catch (e) {
+      handleError(e);
+    }
+  }
+
+  Future<void> toggleFlash() async {
+    if (cameraController.value == null ||
+        !cameraController.value!.value.isInitialized) {
+      qrCodeResult.value = 'دوربین آماده نیست.';
+      return;
+    }
+
+    try {
+      final currentController = cameraController.value;
+      // Check if the camera supports flash
+      if (currentController != null) {
+        isFlashOn.value = !isFlashOn.value;
+        await currentController.setFlashMode(
+          isFlashOn.value ? FlashMode.torch : FlashMode.off,
+        );
+      } else {
+        qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
       }
     } catch (e) {
       handleError(e);
