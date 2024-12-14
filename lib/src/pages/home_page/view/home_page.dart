@@ -8,6 +8,10 @@ class HomePage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      backgroundColor: Color(0xffFDB624),
+      title: Text('Custom QR Code Scanner'),
+    ),
         body: Obx(() => controller.pages[controller.selectedIndex.value]),
         bottomNavigationBar: Obx(() => _buildBottomNavigationBar(context)),
       );
@@ -18,7 +22,6 @@ class HomePage extends GetView<HomePageController> {
           BottomAppBar(
             shape: const CircularNotchedRectangle(),
             notchMargin: 8,
-
             color: const Color(0xff333333),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

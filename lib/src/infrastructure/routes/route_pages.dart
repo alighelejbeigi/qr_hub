@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../pages/home_page/commons/home_page_bindings.dart';
 import '../../pages/home_page/view/home_page.dart';
-
-
+import '../../pages/home_page/view/widget/QRCodeCamera.dart';
 import '../../pages/splash_screen/commons/splash_bindings.dart';
 import '../../pages/splash_screen/view/splash_screen.dart';
 import 'route_names.dart';
