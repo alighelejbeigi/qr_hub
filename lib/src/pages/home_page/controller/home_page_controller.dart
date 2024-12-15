@@ -1,9 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_rx/get_rx.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -64,7 +62,7 @@ class HomePageController extends GetxController {
 
     try {
       final currentController = cameraController.value;
-      // Check if the camera supports flash
+
       if (currentController != null) {
         isFlashOn.value = !isFlashOn.value;
         await currentController.setFlashMode(
