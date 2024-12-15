@@ -39,14 +39,14 @@ class MainPage extends GetView<HomePageController> {
                 FloatingActionButton(
                   heroTag: 'pickGalleryImage',
                   backgroundColor: const Color(0xffFDB624),
-                  onPressed: controller.pickImageFromGallery,
+                  onPressed: ()=> controller.pickImageFromGallery(context),
                   child: const Icon(Icons.image, color: Colors.white),
                 ),
                 const Spacer(flex: 1),
                 FloatingActionButton(
                   heroTag: 'captureQRCode',
                   backgroundColor: const Color(0xffFDB624),
-                  onPressed: controller.captureAndDecodeQRCode,
+                  onPressed:()=> controller.captureAndDecodeQRCode,
                   child: const Icon(Icons.camera_alt, color: Colors.white),
                 ),
                 const Spacer(flex: 1),
