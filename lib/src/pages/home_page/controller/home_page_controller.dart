@@ -24,6 +24,7 @@ class HomePageController extends GetxController {
   late List<CameraDescription> cameras;
   RxString qrCodeResult = ''.obs;
   RxBool isCameraReady = false.obs;
+  RxBool isFlashSupported = false.obs;
   RxInt selectedCameraIndex = 0.obs;
 
   @override
@@ -64,12 +65,20 @@ class HomePageController extends GetxController {
       final currentController = cameraController.value;
 
       if (currentController != null) {
-        isFlashOn.value = !isFlashOn.value;
-        await currentController.setFlashMode(
-          isFlashOn.value ? FlashMode.torch : FlashMode.off,
-        );
+        // تلاش برای تغییر وضعیت فلاش
+        try {
+          isFlashOn.value = !isFlashOn.value;
+          await currentController.setFlashMode(
+            isFlashOn.value ? FlashMode.torch : FlashMode.off,
+          );
+        } catch (e) {
+          // خطا نشان می‌دهد که دستگاه از فلاش پشتیبانی نمی‌کند
+          qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
+          return;
+        }
       } else {
         qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
+        return;
       }
     } catch (e) {
       handleError(e);
@@ -90,6 +99,18 @@ class HomePageController extends GetxController {
 
       cameraController.value = newController;
       await newController.initialize();
+
+      try {
+        if (cameraController.value != null) {
+          await cameraController.value!.setFlashMode(FlashMode.torch);
+          isFlashSupported.value = true;
+
+          await cameraController.value!.setFlashMode(FlashMode.off);
+        }
+      } catch (e) {
+        isFlashSupported.value = false;
+      }
+
       isCameraReady.value = true;
     } catch (e) {
       handleError(e);
