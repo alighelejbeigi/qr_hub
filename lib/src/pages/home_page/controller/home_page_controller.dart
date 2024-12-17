@@ -4,22 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../view/widget/history.dart';
 import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
   final pages = [
-    const Center(child: Text('history Page')),
+    const HistoryPage(),
     const Center(child: Text('Generate Page')),
     const MainPage(),
   ];
-
-  void onTabTapped(int index) {
-    selectedIndex.value = index;
-  }
 
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   late List<CameraDescription> cameras;
@@ -27,6 +25,7 @@ class HomePageController extends GetxController {
   RxBool isCameraReady = false.obs;
   RxBool isFlashSupported = false.obs;
   RxInt selectedCameraIndex = 0.obs;
+  bool isSwitchCamera = false;
 
   @override
   void onInit() {
@@ -34,13 +33,22 @@ class HomePageController extends GetxController {
     initializeCamera();
   }
 
+  @override
+  void onClose() {
+    cameraController.value?.dispose();
+    super.onClose();
+  }
+
+  void onTabTapped(int index) {
+    selectedIndex.value = index;
+  }
+
   Future<void> initializeCamera() async {
     try {
       final cameraPermission = await Permission.camera.request();
 
       if (!cameraPermission.isGranted) {
-        qrCodeResult.value =
-            'دسترسی به دوربین لازم است تا این عملیات انجام شود.';
+        qrCodeResult.value = 'دسترسی به دوربین لازم است تا این عملیات انجام شود.';
         return;
       }
 
@@ -56,8 +64,7 @@ class HomePageController extends GetxController {
   }
 
   Future<void> toggleFlash() async {
-    if (cameraController.value == null ||
-        !cameraController.value!.value.isInitialized) {
+    if (cameraController.value == null || !cameraController.value!.value.isInitialized) {
       qrCodeResult.value = 'دوربین آماده نیست.';
       return;
     }
@@ -66,23 +73,15 @@ class HomePageController extends GetxController {
       final currentController = cameraController.value;
 
       if (currentController != null) {
-        // تلاش برای تغییر وضعیت فلاش
-        try {
-          isFlashOn.value = !isFlashOn.value;
-          await currentController.setFlashMode(
-            isFlashOn.value ? FlashMode.torch : FlashMode.off,
-          );
-        } catch (e) {
-          // خطا نشان می‌دهد که دستگاه از فلاش پشتیبانی نمی‌کند
-          qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
-          return;
-        }
+        isFlashOn.value = !isFlashOn.value;
+        await currentController.setFlashMode(
+          isFlashOn.value ? FlashMode.torch : FlashMode.off,
+        );
       } else {
         qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
-        return;
       }
     } catch (e) {
-      handleError(e);
+      qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
     }
   }
 
@@ -118,82 +117,30 @@ class HomePageController extends GetxController {
     }
   }
 
-
-
-  void showResultDialog(BuildContext context, String result) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          backgroundColor: const Color(0xffFDB624),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.qr_code_2,
-                size: 50,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 15),
-              Text(
-                'نتیجه اسکن QR Code',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () async {
-                  if (await canLaunch(result)) {
-                    await launch(result);
-                  } else {
-                    showResultDialog(context, 'آدرس معتبر نیست.');
-                  }
-                },
-                child: Text(
-                  result,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.white,
-                    decoration: TextDecoration.underline,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'باشه',
-                  style: TextStyle(
-                    color: Color(0xffFDB624),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+  Future<void> saveResult(String result) async {
+    final prefs = await SharedPreferences.getInstance();
+    List<String> history = prefs.getStringList('qr_history') ?? [];
+    // اضافه کردن نتیجه جدید
+    if (!history.contains(result)) {
+      history.add(result);
+      await prefs.setStringList('qr_history', history);
+    }
   }
 
-// Function to show the dialog
-/*
+// هنگام دریافت نتیجه اسکن
+  void handleScanResult(String result) {
+    if (result.isNotEmpty) {
+      saveResult(result); // ذخیره نتیجه
+      // نمایش نتیجه در UI یا اقدامات دیگر
+      print('اسکن موفق: $result');
+    } else {
+      print('خطا: نتیجه اسکن خالی است.');
+    }
+  }
+
+
   void showResultDialog(BuildContext context, String result) {
+    handleScanResult(result);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -206,30 +153,21 @@ class HomePageController extends GetxController {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Icon(
+              const Icon(
                 Icons.qr_code_2,
                 size: 50,
                 color: Colors.white,
               ),
-              const SizedBox(height: 15),
-              Text(
-                'نتیجه اسکن QR Code',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
               const SizedBox(height: 10),
-              Text(
-                result,
+              const Text(
+                'نتیجه اسکن',
                 style: TextStyle(
                   fontSize: 16,
                   color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),
+              clickableResultText(result),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => Navigator.of(context).pop(),
@@ -253,11 +191,42 @@ class HomePageController extends GetxController {
       },
     );
   }
-*/
+
+  Future<void> _launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
+  bool isValidUrl(String url) {
+    const urlPattern = r'^(https?:\/\/)?'
+        r'(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6})'
+        r'(\/[^\s]*)?$';
+    final regex = RegExp(urlPattern);
+    return regex.hasMatch(url);
+  }
+
+  Widget clickableResultText(String result) {
+    bool isValidUrls = isValidUrl(result);
+    return GestureDetector(
+      onTap: () {
+        if (isValidUrls) {
+          _launchURL(result);
+        }
+      },
+      child: Text(
+        result,
+        style: TextStyle(
+          color: isValidUrls ? Colors.blue : Colors.white,
+          decoration: isValidUrls ? TextDecoration.underline : TextDecoration.none,
+        ),
+      ),
+    );
+  }
 
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
-    if (cameraController.value == null ||
-        !cameraController.value!.value.isInitialized) {
+    if (cameraController.value == null || !cameraController.value!.value.isInitialized) {
       showResultDialog(context, 'دوربین آماده نیست.');
       return;
     }
@@ -275,8 +244,7 @@ class HomePageController extends GetxController {
 
   Future<void> pickImageFromGallery(BuildContext context) async {
     try {
-      final pickedImage =
-      await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedImage != null) {
         final bytes = await pickedImage.readAsBytes();
         final qrReader = EasyQRCodeReader();
@@ -290,61 +258,24 @@ class HomePageController extends GetxController {
     }
   }
 
-
-/*  Future<void> captureAndDecodeQRCode() async {
-    if (cameraController.value == null ||
-        !cameraController.value!.value.isInitialized) {
-      qrCodeResult.value = 'دوربین آماده نیست.';
-      return;
-    }
-
-    try {
-      final XFile picture = await cameraController.value!.takePicture();
-      final bytes = await picture.readAsBytes();
-      final qrReader = EasyQRCodeReader();
-      final decodedResult = await qrReader.decode(bytes);
-      qrCodeResult.value = decodedResult ?? 'QR code یافت نشد.';
-    } catch (e) {
-      handleError(e);
-    }
-  }
-
-  Future<void> pickImageFromGallery() async {
-    try {
-      final pickedImage =
-          await ImagePicker().pickImage(source: ImageSource.gallery);
-      if (pickedImage != null) {
-        final bytes = await pickedImage.readAsBytes();
-        final qrReader = EasyQRCodeReader();
-        final decodedResult = await qrReader.decode(bytes);
-        qrCodeResult.value = decodedResult ?? 'QR code یافت نشد.';
-      }
-    } catch (e) {
-      handleError(e);
-    }
-  }*/
-
-  bool isSwitchCamera = false;
-
   void switchCamera() async {
-    if(isSwitchCamera){
+    if (isSwitchCamera) {
       return;
     }
 
     if (cameras.length > 1) {
-      isSwitchCamera= true;
+      isSwitchCamera = true;
       isCameraReady.value = false;
       qrCodeResult.value = 'در حال تغییر دوربین...';
       try {
-        selectedCameraIndex.value =
-            (selectedCameraIndex.value + 1) % cameras.length;
+        selectedCameraIndex.value = (selectedCameraIndex.value + 1) % cameras.length;
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } catch (e) {
         handleError(e);
       } finally {
         isCameraReady.value = true;
         qrCodeResult.value = '';
-        isSwitchCamera= false;
+        isSwitchCamera = false;
       }
     } else {
       qrCodeResult.value = 'فقط یک دوربین در دسترس است.';
@@ -353,11 +284,5 @@ class HomePageController extends GetxController {
 
   void handleError(dynamic e) {
     qrCodeResult.value = 'خطایی رخ داده است: $e';
-  }
-
-  @override
-  void onClose() {
-    cameraController.value?.dispose();
-    super.onClose();
   }
 }

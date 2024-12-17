@@ -18,6 +18,9 @@ dependencies:
   permission_handler: ^11.3.1
   camera: 0.10.6
   url_launcher: ^6.3.1
+  fluttertoast: ^8.2.10
+  webview_flutter: 4.8.0
+  webview_flutter_wkwebview: 3.13.1
   zxing2: ^0.2.3
   qr_flutter: ^4.1.0
   easy_qr_code: ^0.0.1
