@@ -28,8 +28,7 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
-  webview_flutter: 4.8.0
-  webview_flutter_wkwebview: 3.13.1
+  hive_flutter: ^1.1.0
   qr_hub:
     path: ../
   flutter:

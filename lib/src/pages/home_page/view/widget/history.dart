@@ -1,51 +1,55 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({Key? key}) : super(key: key);
+import '../../../../../qr_hub.dart';
+import '../../controller/home_page_controller.dart';
 
-  @override
-  _HistoryPageState createState() => _HistoryPageState();
-}
-
-class _HistoryPageState extends State<HistoryPage> {
-  List<String> history = [];
-
-  @override
-  void initState() {
-    super.initState();
-    loadHistory();
-  }
-
-  Future<void> loadHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      history = prefs.getStringList('qr_history') ?? [];
-    });
-  }
-
-  Future<void> clearHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('qr_history');
-    setState(() {
-      history.clear();
-    });
-  }
+class HistoryPage extends GetView<HomePageController> {
+  const HistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return  history.isNotEmpty
-          ? ListView.builder(
-        itemCount: history.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(history[index]),
-          );
-        },
-      )
-          : const Center(
-        child: Text('هیچ سابقه‌ای وجود ندارد.'),
+    return FutureBuilder<List<History>>(
+      future: controller.getAllHistory(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
 
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        }
+
+        final historyList = snapshot.data ?? [];
+
+        return ListView.builder(
+          itemCount: historyList.length,
+          itemBuilder: (context, index) {
+            final history = historyList[index];
+
+            // قالب نمایش تاریخ
+            final formattedDate = DateFormat('yyyy/MM/dd – HH:mm:ss').format(history.date);
+
+            return ListTile(
+              title: Text(history.text),
+              subtitle: Text(formattedDate), // تاریخ به‌فرمت خوانا
+              trailing: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () async {
+                  await controller.deleteHistory(history.id);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Item deleted!")),
+                  );
+
+                  // به‌روزرسانی لیست پس از حذف
+                  Get.forceAppUpdate();
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }

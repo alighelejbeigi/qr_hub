@@ -2,11 +2,14 @@ import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:uuid/uuid.dart';
 
+import '../../../../qr_hub.dart';
 import '../view/widget/history.dart';
 import '../view/widget/main_page.dart';
 
@@ -14,7 +17,7 @@ class HomePageController extends GetxController {
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
   final pages = [
-    const HistoryPage(),
+     HistoryPage(),
     const Center(child: Text('Generate Page')),
     const MainPage(),
   ];
@@ -117,20 +120,43 @@ class HomePageController extends GetxController {
     }
   }
 
-  Future<void> saveResult(String result) async {
-    final prefs = await SharedPreferences.getInstance();
-    List<String> history = prefs.getStringList('qr_history') ?? [];
-    // اضافه کردن نتیجه جدید
-    if (!history.contains(result)) {
-      history.add(result);
-      await prefs.setStringList('qr_history', history);
-    }
+
+
+
+
+  final uuid = const Uuid();
+
+  Future<void> saveHistory(String result) async {
+    final box = await Hive.openBox<History>('historyBox');
+
+    // ایجاد آیتم جدید با ID یکتا
+    final newHistory = History(
+      text: result,
+      date: DateTime.now(),
+      id: uuid.v4(), // تولید ID یکتا
+    );
+
+    // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
+    await box.put(newHistory.id, newHistory);
   }
+
+  Future<void> deleteHistory(String id) async {
+    final box = await Hive.openBox<History>('historyBox');
+    await box.delete(id);
+  }
+
+  Future<List<History>> getAllHistory() async {
+    final box = await Hive.openBox<History>('historyBox');
+    return box.values.toList();
+  }
+
+
 
 // هنگام دریافت نتیجه اسکن
   void handleScanResult(String result) {
     if (result.isNotEmpty) {
-      saveResult(result); // ذخیره نتیجه
+
+      saveHistory(result); // ذخیره نتیجه
       // نمایش نتیجه در UI یا اقدامات دیگر
       print('اسکن موفق: $result');
     } else {

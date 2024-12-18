@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-
+import 'package:hive_flutter/adapters.dart';
+import 'package:qr_hub/qr_hub.dart';
 import 'my_app.dart';
 
-void main() {
-  WebViewPlatform.instance = WebKitWebViewPlatform();
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  Hive.registerAdapter(HistoryAdapter());
   runApp(const MyApp());
 }
 
