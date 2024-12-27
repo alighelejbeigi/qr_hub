@@ -46,7 +46,7 @@ class MainPage extends GetView<HomePageController> {
                 FloatingActionButton(
                   heroTag: 'captureQRCode',
                   backgroundColor: const Color(0xffFDB624),
-                  onPressed:()=> controller.captureAndDecodeQRCode,
+                  onPressed:()=> controller.captureAndDecodeQRCode(context),
                   child: const Icon(Icons.camera_alt, color: Colors.white),
                 ),
                 const Spacer(flex: 1),

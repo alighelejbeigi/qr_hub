@@ -7,6 +7,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   Hive.registerAdapter(HistoryAdapter());
+  Hive.registerAdapter(QrCodeGenerationHistoryAdapter());
   runApp(const MyApp());
 }
 

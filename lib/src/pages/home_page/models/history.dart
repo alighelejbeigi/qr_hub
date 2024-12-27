@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:hive/hive.dart';
 
 part 'history.g.dart';
@@ -11,11 +13,15 @@ class History extends HiveObject {
   final DateTime date;
 
   @HiveField(2)
-  final String id; // اضافه کردن ID
+  final String id;
+
+  @HiveField(3)
+  final Uint8List? photo; // اضافه کردن فیلد تصویر
 
   History({
     required this.text,
     required this.date,
     required this.id,
+    this.photo,
   });
 }

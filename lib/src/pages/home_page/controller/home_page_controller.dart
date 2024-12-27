@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+
 import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
 import 'package:flutter/material.dart';
@@ -5,20 +8,27 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
+import '../models/qr_code_generation_history.dart';
+import '../models/sample_qr.dart';
+import '../view/widget/generate_page.dart';
 import '../view/widget/history.dart';
 import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
+  final TextEditingController textController = TextEditingController();
+  Rx<Widget> result = Rx<Widget>(const SizedBox());
+  final qrGenerator = EasyQRCodeGenerator();
+  Rx<Uint8List> imageBytes = Rx<Uint8List>(SampleQr().sample);
+  late Uint8List imageBytesForSave;
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
   final pages = [
-     HistoryPage(),
-    const Center(child: Text('Generate Page')),
+    const HistoryPage(),
+    const GeneratePage(),
     const MainPage(),
   ];
 
@@ -33,6 +43,7 @@ class HomePageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
+    textController.text = 'QR HUB';
     initializeCamera();
   }
 
@@ -51,7 +62,8 @@ class HomePageController extends GetxController {
       final cameraPermission = await Permission.camera.request();
 
       if (!cameraPermission.isGranted) {
-        qrCodeResult.value = 'دسترسی به دوربین لازم است تا این عملیات انجام شود.';
+        qrCodeResult.value =
+            'دسترسی به دوربین لازم است تا این عملیات انجام شود.';
         return;
       }
 
@@ -67,7 +79,8 @@ class HomePageController extends GetxController {
   }
 
   Future<void> toggleFlash() async {
-    if (cameraController.value == null || !cameraController.value!.value.isInitialized) {
+    if (cameraController.value == null ||
+        !cameraController.value!.value.isInitialized) {
       qrCodeResult.value = 'دوربین آماده نیست.';
       return;
     }
@@ -120,13 +133,9 @@ class HomePageController extends GetxController {
     }
   }
 
-
-
-
-
   final uuid = const Uuid();
 
-  Future<void> saveHistory(String result) async {
+  Future<void> saveHistoryRead(String result) async {
     final box = await Hive.openBox<History>('historyBox');
 
     // ایجاد آیتم جدید با ID یکتا
@@ -134,6 +143,7 @@ class HomePageController extends GetxController {
       text: result,
       date: DateTime.now(),
       id: uuid.v4(), // تولید ID یکتا
+      photo: imageBytesForSave,
     );
 
     // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
@@ -145,25 +155,43 @@ class HomePageController extends GetxController {
     await box.delete(id);
   }
 
+  Future<void> deleteHistoryGeneration(String id) async {
+    final box2 = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+    await box2.delete(id);
+  }
+
+  Future<void> saveHistoryGeneration(String result) async {
+    final box = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+
+    // ایجاد آیتم جدید با ID یکتا
+    final newHistory = QrCodeGenerationHistory(
+      text: result,
+      date: DateTime.now(),
+      id: uuid.v4(), // تولید ID یکتا
+      qrImage: imageBytes.value,
+    );
+
+    // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
+    await box.put(newHistory.id, newHistory);
+  }
+
   Future<List<History>> getAllHistory() async {
     final box = await Hive.openBox<History>('historyBox');
     return box.values.toList();
   }
 
-
+  Future<List<QrCodeGenerationHistory>> getAllGenerationHistory() async {
+    final box = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+    return box.values.toList();
+  }
 
 // هنگام دریافت نتیجه اسکن
   void handleScanResult(String result) {
     if (result.isNotEmpty) {
-
-      saveHistory(result); // ذخیره نتیجه
+      saveHistoryRead(result); // ذخیره نتیجه
       // نمایش نتیجه در UI یا اقدامات دیگر
-      print('اسکن موفق: $result');
-    } else {
-      print('خطا: نتیجه اسکن خالی است.');
-    }
+    } else {}
   }
-
 
   void showResultDialog(BuildContext context, String result) {
     handleScanResult(result);
@@ -245,14 +273,16 @@ class HomePageController extends GetxController {
         result,
         style: TextStyle(
           color: isValidUrls ? Colors.blue : Colors.white,
-          decoration: isValidUrls ? TextDecoration.underline : TextDecoration.none,
+          decoration:
+              isValidUrls ? TextDecoration.underline : TextDecoration.none,
         ),
       ),
     );
   }
 
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
-    if (cameraController.value == null || !cameraController.value!.value.isInitialized) {
+    if (cameraController.value == null ||
+        !cameraController.value!.value.isInitialized) {
       showResultDialog(context, 'دوربین آماده نیست.');
       return;
     }
@@ -260,6 +290,7 @@ class HomePageController extends GetxController {
     try {
       final XFile picture = await cameraController.value!.takePicture();
       final bytes = await picture.readAsBytes();
+      imageBytesForSave = bytes;
       final qrReader = EasyQRCodeReader();
       final decodedResult = await qrReader.decode(bytes);
       showResultDialog(context, decodedResult ?? 'QR code یافت نشد.');
@@ -270,9 +301,11 @@ class HomePageController extends GetxController {
 
   Future<void> pickImageFromGallery(BuildContext context) async {
     try {
-      final pickedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+      final pickedImage =
+          await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedImage != null) {
         final bytes = await pickedImage.readAsBytes();
+        imageBytesForSave = bytes;
         final qrReader = EasyQRCodeReader();
         final decodedResult = await qrReader.decode(bytes);
         showResultDialog(context, decodedResult ?? 'QR code یافت نشد.');
@@ -294,7 +327,8 @@ class HomePageController extends GetxController {
       isCameraReady.value = false;
       qrCodeResult.value = 'در حال تغییر دوربین...';
       try {
-        selectedCameraIndex.value = (selectedCameraIndex.value + 1) % cameras.length;
+        selectedCameraIndex.value =
+            (selectedCameraIndex.value + 1) % cameras.length;
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } catch (e) {
         handleError(e);
@@ -306,6 +340,31 @@ class HomePageController extends GetxController {
     } else {
       qrCodeResult.value = 'فقط یک دوربین در دسترس است.';
     }
+  }
+
+  Future<void> generateQRCode() async {
+    final data = textController.text;
+    if (data.isNotEmpty) {
+      final qrWidget = await qrGenerator.generateQRCodeImage(data: data);
+      final bytes = await convertImageToBytes(qrWidget);
+      imageBytes.value = bytes!;
+      saveHistoryGeneration(data);
+    }
+  }
+
+  Future<Uint8List?> convertImageToBytes(ui.Image image) async {
+    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData?.buffer.asUint8List();
+  }
+
+  // Method to save generated QR code image
+  Future<void> saveQRCodeImage() async {
+    qrGenerator.saveQRCodeFromBytes(qrBytes: imageBytes.value);
+  }
+
+  // Method to share generated QR code image
+  Future<void> shareQRCodeImage() async {
+    qrGenerator.shareQRCodeFromBytes(qrBytes: imageBytes.value);
   }
 
   void handleError(dynamic e) {
