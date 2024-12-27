@@ -27,3 +27,10 @@ migrate_working_dir/
 **/doc/api/
 .dart_tool/
 build/
+/.flutter-plugins
+/.flutter-plugins-dependencies
+/example/ios/Podfile
+/example/macos/Podfile
+/example/ios/Podfile.lock
+/lib/src/pages/home_page/models/qr_code_generate_history.g.dart
+/lib/src/pages/home_page/models/qr_code_scan_history.g.dart
