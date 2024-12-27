@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../qr_hub.dart';
 import '../controller/home_page_controller.dart';
 
 class HomePage extends GetView<HomePageController> {
@@ -9,8 +11,15 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color(0xffFDB624),
-          title: const Text('Custom QR Code Scanner'),
+          title: const Text('QR Hub'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings),
+              onPressed: () => context.push(RouteNames.settingPage),
+            ),
+          ],
         ),
         body: Obx(() => controller.pages[controller.selectedIndex.value]),
         bottomNavigationBar: _buildBottomNavigationBar(context),

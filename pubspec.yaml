@@ -19,11 +19,8 @@ dependencies:
   camera: 0.10.6
   url_launcher: ^6.3.1
   fluttertoast: ^8.2.10
-  webview_flutter: 4.8.0
   hive_flutter: ^1.1.0
   uuid: ^4.5.1
-  zxing2: ^0.2.3
-  qr_flutter: ^4.1.0
   easy_qr_code: ^0.1.0
   flutter:
     sdk: flutter

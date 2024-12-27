@@ -7,9 +7,10 @@ import '../../../../qr_hub.dart';
 class SplashController extends GetxController {
   void goToLoginPage(BuildContext context) {
     Future.delayed(
-      const Duration(seconds: 3),
+      const Duration(seconds: 2),
       () {
-        context.push(RouteNames.homePage);
+        if (!context.mounted) return;
+        context.go(RouteNames.homePage);
       },
     );
   }

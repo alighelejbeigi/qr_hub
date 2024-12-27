@@ -10,7 +10,7 @@ class MyApp extends StatelessWidget {
         title: 'Qr Hub',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xffFDB624)),
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
@@ -19,12 +19,12 @@ class MyApp extends StatelessWidget {
           Locale('fa', 'IR'), // Persian locale
           // Add more supported locales if needed
         ],
-        builder: (context, child) {
+      /*  builder: (context, child) {
           return Directionality(
-            textDirection: TextDirection.rtl,
+            textDirection: TextDirection.ltr,
             child: child!,
           );
-        },
+        },*/
         routerConfig: RoutePages.router,
       );
 }

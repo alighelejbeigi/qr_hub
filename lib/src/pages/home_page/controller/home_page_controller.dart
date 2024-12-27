@@ -12,10 +12,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
-import '../models/qr_code_generation_history.dart';
 import '../models/sample_qr.dart';
 import '../view/widget/generate_page.dart';
-import '../view/widget/history.dart';
+import '../view/widget/history_page.dart';
 import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
@@ -23,9 +22,10 @@ class HomePageController extends GetxController {
   Rx<Widget> result = Rx<Widget>(const SizedBox());
   final qrGenerator = EasyQRCodeGenerator();
   Rx<Uint8List> imageBytes = Rx<Uint8List>(SampleQr().sample);
-  late Uint8List imageBytesForSave;
+  Uint8List? imageBytesForSave;
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
+
   final pages = [
     const HistoryPage(),
     const GeneratePage(),
