@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:hive/hive.dart';
 
-part 'qr_code_generation_history.g.dart';
+part 'qr_code_generate_history.g.dart';
 
 @HiveType(typeId: 1)
-class QrCodeGenerationHistory extends HiveObject {
+class QrCodeGenerateHistory extends HiveObject {
   @HiveField(0)
   final String text; // متن QR Code
 
@@ -16,12 +16,12 @@ class QrCodeGenerationHistory extends HiveObject {
   final String id;
 
   @HiveField(3)
-  final Uint8List? qrImage; // تصویر QR Code
+  final Uint8List? photo; // تصویر QR Code
 
-  QrCodeGenerationHistory({
+  QrCodeGenerateHistory({
     required this.text,
     required this.date,
     required this.id,
-    this.qrImage,
+    this.photo,
   });
 }

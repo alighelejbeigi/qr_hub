@@ -6,8 +6,8 @@ import 'my_app.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  Hive.registerAdapter(HistoryAdapter());
-  Hive.registerAdapter(QrCodeGenerationHistoryAdapter());
+  Hive.registerAdapter(QrCodeScanHistoryAdapter());
+  Hive.registerAdapter(QrCodeGenerateHistoryAdapter());
   runApp(const MyApp());
 }
 

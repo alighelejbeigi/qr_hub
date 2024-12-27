@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:hive/hive.dart';
 
-part 'history.g.dart';
+part 'qr_code_scan_history.g.dart';
 
 @HiveType(typeId: 0)
-class History extends HiveObject {
+class QrCodeScanHistory extends HiveObject {
   @HiveField(0)
   final String text;
 
@@ -18,7 +18,7 @@ class History extends HiveObject {
   @HiveField(3)
   final Uint8List? photo; // اضافه کردن فیلد تصویر
 
-  History({
+  QrCodeScanHistory({
     required this.text,
     required this.date,
     required this.id,

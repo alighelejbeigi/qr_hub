@@ -4,7 +4,7 @@ import 'package:qr_hub/qr_hub.dart';
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) => MaterialApp.router(
         title: 'Qr Hub',
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
         ),
         supportedLocales: const [
           Locale('en', 'US'),
-          Locale('fa', 'IR'), // Persian locale
+          Locale('fa', 'IR')
           // Add more supported locales if needed
         ],
       /*  builder: (context, child) {

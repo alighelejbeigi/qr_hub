@@ -43,7 +43,7 @@ class HomePageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    textController.text = 'QR HUB';
+    //textController.text = 'QR HUB';
     initializeCamera();
   }
 
@@ -136,10 +136,10 @@ class HomePageController extends GetxController {
   final uuid = const Uuid();
 
   Future<void> saveHistoryRead(String result) async {
-    final box = await Hive.openBox<History>('historyBox');
+    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
 
     // ایجاد آیتم جدید با ID یکتا
-    final newHistory = History(
+    final newHistory = QrCodeScanHistory(
       text: result,
       date: DateTime.now(),
       id: uuid.v4(), // تولید ID یکتا
@@ -151,37 +151,37 @@ class HomePageController extends GetxController {
   }
 
   Future<void> deleteHistory(String id) async {
-    final box = await Hive.openBox<History>('historyBox');
+    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
     await box.delete(id);
   }
 
   Future<void> deleteHistoryGeneration(String id) async {
-    final box2 = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+    final box2 = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
     await box2.delete(id);
   }
 
   Future<void> saveHistoryGeneration(String result) async {
-    final box = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+    final box = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
 
     // ایجاد آیتم جدید با ID یکتا
-    final newHistory = QrCodeGenerationHistory(
+    final newHistory = QrCodeGenerateHistory(
       text: result,
       date: DateTime.now(),
       id: uuid.v4(), // تولید ID یکتا
-      qrImage: imageBytes.value,
+      photo: imageBytes.value,
     );
 
     // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
     await box.put(newHistory.id, newHistory);
   }
 
-  Future<List<History>> getAllHistory() async {
-    final box = await Hive.openBox<History>('historyBox');
+  Future<List<QrCodeScanHistory>> getAllHistory() async {
+    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
     return box.values.toList();
   }
 
-  Future<List<QrCodeGenerationHistory>> getAllGenerationHistory() async {
-    final box = await Hive.openBox<QrCodeGenerationHistory>('qrCodeGenerationHistoryBox');
+  Future<List<QrCodeGenerateHistory>> getAllGenerationHistory() async {
+    final box = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
     return box.values.toList();
   }
 

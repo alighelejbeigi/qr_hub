@@ -29,50 +29,44 @@ class SplashScreen extends GetView<SplashController> {
     );
   }
 
-  Widget _buildBackgroundImage() {
-    return Positioned.fill(
-      child: Image.asset(
-        'assets/splash.png',
-        package: 'qr_hub',
-        scale: 0.6,
-        fit: BoxFit.cover,
-      ),
-    );
-  }
+  Widget _buildBackgroundImage() => Positioned.fill(
+        child: Image.asset(
+          'assets/splash.png',
+          package: 'qr_hub',
+          scale: 0.6,
+          fit: BoxFit.cover,
+        ),
+      );
 
-  Widget _buildTitle(double screenHeight) {
-    return Positioned(
-      bottom: screenHeight * 0.5,
-      left: 0,
-      right: 0,
-      child: const Center(
-        child: Text(
-          'Qr Hub',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 40,
-            fontWeight: FontWeight.bold,
+  Widget _buildTitle(double screenHeight) => Positioned(
+        bottom: screenHeight * 0.5,
+        left: 0,
+        right: 0,
+        child: const Center(
+          child: Text(
+            'Qr Hub',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 
-  Widget _buildVersionInfo(double screenHeight) {
-    return Positioned(
-      bottom: screenHeight * 0.1,
-      left: 0,
-      right: 0,
-      child: const Center(
-        child: Text(
-          'version 0.1',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
+  Widget _buildVersionInfo(double screenHeight) => Positioned(
+        bottom: screenHeight * 0.1,
+        left: 0,
+        right: 0,
+        child: const Center(
+          child: Text(
+            'version 0.1',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }

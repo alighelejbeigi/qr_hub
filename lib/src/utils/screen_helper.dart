@@ -6,11 +6,11 @@ class ScreenHelper extends StatelessWidget {
   final Widget desktop;
 
   const ScreenHelper({
-    Key? key,
+    super.key,
     required this.desktop,
     required this.mobile,
     required this.tablet,
-  }) : super(key: key);
+  });
 
   static bool isMobile(BuildContext context) =>
       MediaQuery.of(context).size.width < 800.0;

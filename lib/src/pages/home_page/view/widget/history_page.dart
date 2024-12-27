@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -11,140 +13,62 @@ class HistoryPage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2, // تعداد تب‌ها
+      length: 2, // Number of tabs
       child: SafeArea(
         child: Column(
           children: [
-            // AppBar with TabBar (without Scaffold)
-            Container(
-             // color: Theme.of(context).primaryColor,
-              child: Column(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      'History',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
+            // AppBar with TabBar
+            const Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Text(
+                    'History',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const TabBar(
-                    tabs: [
-                      Tab(text: 'Generated QR Codes'), // Tab 1
-                      Tab(text: 'Scanned QR Codes'), // Tab 2
-                    ],
-                  ),
-                ],
-              ),
+                ),
+                TabBar(
+                  tabs: [
+                    Tab(text: 'Scanned QR Codes'), // Tab 1
+                    Tab(text: 'Generated QR Codes'), // Tab 2
+                  ],
+                ),
+              ],
             ),
             // TabBarView with content
             Expanded(
               child: TabBarView(
                 children: [
                   // Tab 1: Show Generated QR Codes History
-                  FutureBuilder<List<History>>(
-                    future: controller.getAllHistory(), // Get history of generated QR codes
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(child: Text("Error: ${snapshot.error}"));
-                      }
-
-                      final historyList = snapshot.data ?? [];
-
-                      return ListView.builder(
-                        itemCount: historyList.length,
-                        itemBuilder: (context, index) {
-                          final history = historyList[index];
-
-                          // Format date for display
-                          final formattedDate = DateFormat('yyyy/MM/dd – HH:mm:ss')
-                              .format(history.date);
-
-                          return ListTile(
-                            title: Text(history.text),
-                            subtitle: Text(formattedDate), // Display formatted date
-                            leading: history.photo != null
-                                ? Image.memory(
-                              history.photo!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )
-                                : const Icon(Icons.image),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () async {
-                                await controller.deleteHistory(history.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Item deleted!")),
-                                );
-
-                                // Update list after deletion
-                                Get.forceAppUpdate();
-                              },
-                            ),
-                          );
-                        },
-                      );
+                  _buildHistoryList<QrCodeScanHistory>(
+                    future: controller.getAllHistory(),
+                    itemBuilder: (context, history) {
+                      return _buildHistoryTile(
+                          history, history.text, history.date, history.photo,
+                          () async {
+                        await controller.deleteHistory(history.id);
+                        if (!context.mounted) return;
+                        _showSnackBar(context, "Item deleted!");
+                        Get.forceAppUpdate();
+                      });
                     },
                   ),
                   // Tab 2: Show Scanned QR Codes History
-                  FutureBuilder<List<QrCodeGenerationHistory>>(
+                  _buildHistoryList<QrCodeGenerateHistory>(
                     future: controller.getAllGenerationHistory(),
-                    // Get history of scanned QR codes
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      if (snapshot.hasError) {
-                        return Center(child: Text("Error: ${snapshot.error}"));
-                      }
-
-                      final historyList = snapshot.data ?? [];
-
-                      return ListView.builder(
-                        itemCount: historyList.length,
-                        itemBuilder: (context, index) {
-                          final history2 = historyList[index];
-
-                          // Format date for display
-                          final formattedDate = DateFormat('yyyy/MM/dd – HH:mm:ss')
-                              .format(history2.date);
-
-                          return ListTile(
-                            title: Text(history2.text),
-                            subtitle: Text(formattedDate), // Display formatted date
-                            leading: history2.qrImage != null
-                                ? Image.memory(
-                              history2.qrImage!,
-                              width: 50,
-                              height: 50,
-                              fit: BoxFit.cover,
-                            )
-                                : const Icon(Icons.image),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete),
-                              onPressed: () async {
-                                await controller.deleteHistoryGeneration(history2.id);
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Item deleted!")),
-                                );
-
-                                // Update list after deletion
-                                Get.forceAppUpdate();
-                              },
-                            ),
-                          );
-                        },
-                      );
+                    itemBuilder: (context, history) {
+                      return _buildHistoryTile(
+                          history, history.text, history.date, history.photo,
+                          () async {
+                        await controller.deleteHistoryGeneration(history.id);
+                        if (!context.mounted) return;
+                        _showSnackBar(context, "Item deleted!");
+                        Get.forceAppUpdate();
+                      });
                     },
                   ),
                 ],
@@ -154,5 +78,63 @@ class HistoryPage extends GetView<HomePageController> {
         ),
       ),
     );
+  }
+
+  // Generic builder for history lists (for both generated and scanned QR codes)
+  Widget _buildHistoryList<T>({
+    required Future<List<T>> future,
+    required Widget Function(BuildContext context, T history) itemBuilder,
+  }) {
+    return FutureBuilder<List<T>>(
+      future: future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          return Center(child: Text("Error: ${snapshot.error}"));
+        }
+
+        final historyList = snapshot.data ?? [];
+
+        return ListView.builder(
+          itemCount: historyList.length,
+          itemBuilder: (context, index) {
+            final history = historyList[index];
+            return itemBuilder(context, history);
+          },
+        );
+      },
+    );
+  }
+
+  // Helper method to build a ListTile for each history entry
+  Widget _buildHistoryTile(
+    dynamic history,
+    String text,
+    DateTime date,
+    Uint8List? photo,
+    VoidCallback onDelete,
+  ) {
+    final formattedDate = DateFormat('yyyy/MM/dd – HH:mm:ss').format(date);
+
+    return ListTile(
+      title: Text(text),
+      subtitle: Text(formattedDate), // Display formatted date
+      leading: photo != null
+          ? Image.memory(photo, width: 50, height: 50, fit: BoxFit.cover)
+          : const Icon(Icons.image),
+      trailing: IconButton(
+        icon: const Icon(Icons.delete),
+        onPressed: onDelete,
+      ),
+    );
+  }
+
+  // Show a SnackBar with a message
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 }
