@@ -35,7 +35,8 @@ class HistoryPage extends GetView<HomePageController> {
                   // Color for selected tab text
                   unselectedLabelColor: Colors.white,
                   // Color for unselected tab text
-                  indicator: null,
+                  indicator: BoxDecoration(),
+                  dividerHeight: 0,
                   // Disable the bottom indicator or selection highlight
                   tabs: [
                     Tab(text: 'Scanned QR Codes'), // Tab 1
@@ -58,10 +59,8 @@ class HistoryPage extends GetView<HomePageController> {
                         history.date,
                         history.photo,
                         () async {
-                          await controller.deleteHistory(history.id);
-                          if (!context.mounted) return;
-                          _showSnackBar(context, "Item deleted!");
-                          Get.forceAppUpdate();
+                          controller.showDeleteDialog(context,history.id,true);
+
                         },
                       );
                     },
@@ -76,10 +75,8 @@ class HistoryPage extends GetView<HomePageController> {
                         history.date,
                         history.photo,
                         () async {
-                          await controller.deleteHistoryGeneration(history.id);
-                          if (!context.mounted) return;
-                          _showSnackBar(context, "Item deleted!");
-                          Get.forceAppUpdate();
+                           controller.showDeleteDialog(context,history.id,false);
+
                         },
                       );
                     },
@@ -168,8 +165,7 @@ class HistoryPage extends GetView<HomePageController> {
   }
 
   // Show a SnackBar with a message
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
+
 }
+
+

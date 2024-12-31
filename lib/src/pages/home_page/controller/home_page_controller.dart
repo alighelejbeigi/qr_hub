@@ -32,6 +32,12 @@ class HomePageController extends GetxController {
     const MainPage(),
   ];
 
+  final titles = [
+    const Text('History Page'),
+    const Text('Generate'),
+    const Text('QR Hub'),
+  ];
+
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   late List<CameraDescription> cameras;
   RxString qrCodeResult = ''.obs;
@@ -350,6 +356,45 @@ class HomePageController extends GetxController {
       imageBytes.value = bytes!;
       saveHistoryGeneration(data);
     }
+  }
+
+
+  void showDeleteDialog(BuildContext context,String id,bool isScanHistory ) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Item'),
+          content: const Text('Are you sure you want to delete?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+               if (isScanHistory) {
+                 await deleteHistory(id);
+               }else{
+                await deleteHistoryGeneration(id);
+               }
+               if (!context.mounted) return;
+               _showSnackBar(context, "Item deleted!");
+               Get.forceAppUpdate();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
   Future<Uint8List?> convertImageToBytes(ui.Image image) async {

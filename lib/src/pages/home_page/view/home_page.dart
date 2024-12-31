@@ -18,57 +18,54 @@ class HomePage extends GetView<HomePageController> {
       );
 
   // AppBar Method
-  AppBar _buildAppBar(BuildContext context) {
-    return AppBar(
-      automaticallyImplyLeading: false,
-      backgroundColor: const Color(0xffFDB624),
-      title: const Text('QR Hub'),
-      actions: [
-        IconButton(
+  AppBar _buildAppBar(BuildContext context) => AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color(0xffFDB624),
+        title:  Obx(() => controller.titles[controller.selectedIndex.value]),
+        actions: [
+          /* IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => context.push(RouteNames.settingPage),
-        ),
-      ],
-    );
-  }
+        ),*/
+        ],
+      );
 
   // Body Method
-  Widget _buildBody() {
-    return Obx(() => controller.pages[controller.selectedIndex.value]);
-  }
+  Widget _buildBody() =>
+      Obx(() => controller.pages[controller.selectedIndex.value]);
 
   // Bottom Navigation Bar Method
   Widget _buildBottomNavigationBar(BuildContext context) => BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      notchMargin: 8,
-      color: const Color(0xff333333),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _buildBottomBarButton(
-            context: context,
-            label: 'Generate',
-            icon: Icons.qr_code_2,
-            isSelected: controller.selectedIndex.value == 1,
-            onTap: () {
-              controller.onTabTapped(1);
-              Get.forceAppUpdate();
-            },
-          ),
-          const SizedBox(width: 58),
-          _buildBottomBarButton(
-            context: context,
-            label: 'History',
-            icon: Icons.history,
-            isSelected: controller.selectedIndex.value == 0,
-            onTap: () {
-              controller.onTabTapped(0);
-              Get.forceAppUpdate();
-            },
-          ),
-        ],
-      ),
-    );
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 8,
+        color: const Color(0xff333333),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _buildBottomBarButton(
+              context: context,
+              label: 'Generate',
+              icon: Icons.qr_code_2,
+              isSelected: controller.selectedIndex.value == 1,
+              onTap: () {
+                controller.onTabTapped(1);
+                Get.forceAppUpdate();
+              },
+            ),
+            const SizedBox(width: 58),
+            _buildBottomBarButton(
+              context: context,
+              label: 'History',
+              icon: Icons.history,
+              isSelected: controller.selectedIndex.value == 0,
+              onTap: () {
+                controller.onTabTapped(0);
+                Get.forceAppUpdate();
+              },
+            ),
+          ],
+        ),
+      );
 
   // Bottom Bar Button Method
   Widget _buildBottomBarButton({
@@ -128,3 +125,4 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 }
+

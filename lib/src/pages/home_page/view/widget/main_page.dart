@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/home_page_controller.dart';
+import 'clipper_for_camera_preview.dart';
 
 class MainPage extends GetView<HomePageController> {
   const MainPage({super.key});
@@ -12,7 +13,7 @@ class MainPage extends GetView<HomePageController> {
         children: [
           _buildCameraPreview(),
           _buildActionButtons(context),
-          _buildQRCodeResult(),
+          //_buildQRCodeResult(),
         ],
       );
 
@@ -25,7 +26,12 @@ class MainPage extends GetView<HomePageController> {
           currentController.value.isInitialized) {
         return Column(
           children: [
-            Expanded(child: CameraPreview(currentController)),
+            Expanded(
+              child: ClipPath(
+                clipper: BottomCircularNotchClipper(),
+                child: CameraPreview(currentController),
+              ),
+            ),
           ],
         );
       } else {
@@ -41,21 +47,21 @@ class MainPage extends GetView<HomePageController> {
   // Action Buttons Method (Gallery, Capture, Switch Camera, Flashlight)
   Widget _buildActionButtons(BuildContext context) {
     return Positioned(
-      bottom: 16,
+      bottom: 30,
       left: 0,
       right: 0,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Spacer(flex: 2),
+          const Spacer(flex: 1),
           _buildPickGalleryButton(context),
           const Spacer(flex: 1),
           _buildCaptureQRCodeButton(context),
-          const Spacer(flex: 1),
+          const Spacer(flex: 2),
           _buildSwitchCameraButton(),
           const Spacer(flex: 1),
           _buildFlashlightButton(),
-          const Spacer(flex: 2),
+          const Spacer(flex: 1),
         ],
       ),
     );
@@ -107,7 +113,7 @@ class MainPage extends GetView<HomePageController> {
         ));
   }
 
-  // QR Code Result Method
+/*  // QR Code Result Method
   Widget _buildQRCodeResult() {
     return Positioned(
       top: 16,
@@ -123,5 +129,5 @@ class MainPage extends GetView<HomePageController> {
             ),
           )),
     );
-  }
+  }*/
 }
