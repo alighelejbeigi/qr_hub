@@ -109,7 +109,7 @@ class DetailsPage extends GetView<DetailsController> {
                           children: [
                             ElevatedButton.icon(
                               onPressed: () {
-                                // Implement save logic
+                               controller.saveQRCodeImage();
                               },
                               icon: const Icon(Icons.save_alt),
                               label: const Text('Save'),
@@ -124,7 +124,7 @@ class DetailsPage extends GetView<DetailsController> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                                // Implement share logic
+                               controller.shareQRCodeImage();
                               },
                               icon: const Icon(Icons.share),
                               label: const Text('Share'),
@@ -139,7 +139,7 @@ class DetailsPage extends GetView<DetailsController> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                                // Implement copy logic
+                              controller.copyToClipboard();
                               },
                               icon: const Icon(Icons.copy),
                               label: const Text('Copy'),
