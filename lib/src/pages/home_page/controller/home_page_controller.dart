@@ -27,6 +27,7 @@ class HomePageController extends GetxController {
   RxBool isFlashOn = false.obs;
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   late List<CameraDescription> cameras;
+
   //RxString qrCodeResult = ''.obs;
   RxBool isCameraReady = false.obs;
   RxBool isFlashSupported = false.obs;
@@ -45,8 +46,6 @@ class HomePageController extends GetxController {
     const Text('Generate QR'),
     const Text('QR Hub'),
   ];
-
-
 
   @override
   void onInit() {
@@ -79,7 +78,6 @@ class HomePageController extends GetxController {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
         _showSnackBar('دوربینی در دسترس نیست.');
-
       }
     } catch (e) {
       handleError(e);
@@ -89,7 +87,7 @@ class HomePageController extends GetxController {
   Future<void> toggleFlash() async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      _showSnackBar( 'دوربین آماده نیست.');
+      _showSnackBar('دوربین آماده نیست.');
 
       return;
     }
@@ -104,11 +102,9 @@ class HomePageController extends GetxController {
         );
       } else {
         _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
-
       }
     } catch (e) {
       _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
-
     }
   }
 
@@ -144,8 +140,6 @@ class HomePageController extends GetxController {
     }
   }
 
-
-
   Future<void> saveHistoryRead(String result) async {
     final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
 
@@ -159,7 +153,6 @@ class HomePageController extends GetxController {
 
     // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
     await box.put(newHistory.id, newHistory);
-
   }
 
   Future<void> deleteHistory(String id) async {
@@ -201,16 +194,8 @@ class HomePageController extends GetxController {
     return box.values.toList();
   }
 
-// هنگام دریافت نتیجه اسکن
-  void handleScanResult(String result) {
-    if (result.isNotEmpty) {
-      saveHistoryRead(result); // ذخیره نتیجه
-      // نمایش نتیجه در UI یا اقدامات دیگر
-    } else {}
-  }
-
   void showResultDialog(BuildContext context, String result) {
-    handleScanResult(result);
+    saveHistoryRead(result);
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -299,7 +284,7 @@ class HomePageController extends GetxController {
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      showResultDialog(context, 'دوربین آماده نیست.');
+      _showSnackBar('دوربین آماده نیست.');
       return;
     }
 
@@ -309,9 +294,14 @@ class HomePageController extends GetxController {
       imageBytesForSave = bytes;
       final qrReader = EasyQRCodeReader();
       final decodedResult = await qrReader.decode(bytes);
-      showResultDialog(context, decodedResult ?? 'QR code یافت نشد.');
+      if (decodedResult != null) {
+        if (!context.mounted) return;
+        showResultDialog(context, decodedResult);
+      } else {
+        _showSnackBar('QR code یافت نشد.');
+      }
     } catch (e) {
-      showResultDialog(context, 'خطا در اسکن QR Code: $e');
+      _showSnackBar('خطا در اسکن QR Code: $e');
     }
   }
 
@@ -324,12 +314,17 @@ class HomePageController extends GetxController {
         imageBytesForSave = bytes;
         final qrReader = EasyQRCodeReader();
         final decodedResult = await qrReader.decode(bytes);
-        showResultDialog(context, decodedResult ?? 'QR code یافت نشد.');
+        if (decodedResult != null) {
+          if (!context.mounted) return;
+          showResultDialog(context, decodedResult);
+        } else {
+          _showSnackBar('QR code یافت نشد.');
+        }
       } else {
-        showResultDialog(context, 'تصویری انتخاب نشد.');
+        _showSnackBar('تصویری انتخاب نشد.');
       }
     } catch (e) {
-      showResultDialog(context, 'خطا در انتخاب تصویر: $e');
+      _showSnackBar('خطا در انتخاب تصویر: $e');
     }
   }
 
@@ -356,8 +351,7 @@ class HomePageController extends GetxController {
         isSwitchCamera = false;
       }
     } else {
-_showSnackBar('فقط یک دوربین در دسترس است.');
-
+      _showSnackBar('فقط یک دوربین در دسترس است.');
     }
   }
 
@@ -394,7 +388,7 @@ _showSnackBar('فقط یک دوربین در دسترس است.');
                 }
                 if (!context.mounted) return;
 
-                _showSnackBar( "Item deleted!");
+                _showSnackBar("Item deleted!");
                 Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
@@ -406,7 +400,7 @@ _showSnackBar('فقط یک دوربین در دسترس است.');
     );
   }
 
-  void _showSnackBar( String message) {
+  void _showSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
@@ -414,8 +408,7 @@ _showSnackBar('فقط یک دوربین در دسترس است.');
         timeInSecForIosWeb: 1,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
 
   Future<Uint8List?> convertImageToBytes(ui.Image image) async {

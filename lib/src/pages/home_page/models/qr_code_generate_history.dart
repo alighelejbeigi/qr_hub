@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+
+
 
 part 'qr_code_generate_history.g.dart';
 

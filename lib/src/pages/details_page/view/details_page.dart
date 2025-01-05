@@ -6,10 +6,12 @@ class DetailsPage extends GetView<DetailsController> {
   const DetailsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => WillPopScope(
-        onWillPop: () async {
-          Get.delete<DetailsController>();
-          return true;
+  Widget build(BuildContext context) => PopScope(
+        onPopInvokedWithResult: (didPop, result) {
+          () async {
+            Get.delete<DetailsController>();
+            return true;
+          };
         },
         child: Scaffold(
           backgroundColor: const Color(0xff606060),
@@ -32,10 +34,11 @@ class DetailsPage extends GetView<DetailsController> {
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color: Colors.black.withAlpha((0.1 * 255).toInt()), // تبدیل 0.1 به مقدار معادل در withAlpha
                                 blurRadius: 10,
                                 offset: const Offset(0, 4),
                               ),
+
                             ],
                             borderRadius: BorderRadius.circular(12.0),
                             //border: Border.all(color: Colors.white),
@@ -75,31 +78,32 @@ class DetailsPage extends GetView<DetailsController> {
                         const SizedBox(height: 24.0),
 
                         // QR Code Image Section
-                       
-                          Container(
-                            padding: const EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(12.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 10,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Image.memory(
-                              qrCodeScan()
-                                  ? controller.itemScan!.photo!
-                                  : controller.itemGenerait!.photo!,
-                              height: 200,
-                              width: 200,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) =>
-                                  const Icon(Icons.error, size: 50),
-                            ),
+
+                        Container(
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withAlpha((0.1 * 255).toInt()), // تبدیل 0.1 به مقدار معادل در withAlpha
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+
+                            ],
                           ),
+                          child: Image.memory(
+                            qrCodeScan()
+                                ? controller.itemScan!.photo!
+                                : controller.itemGenerait!.photo!,
+                            height: 200,
+                            width: 200,
+                            fit: BoxFit.contain,
+                            errorBuilder: (context, error, stackTrace) =>
+                                const Icon(Icons.error, size: 50),
+                          ),
+                        ),
 
                         const SizedBox(height: 24.0),
 
@@ -109,7 +113,7 @@ class DetailsPage extends GetView<DetailsController> {
                           children: [
                             ElevatedButton.icon(
                               onPressed: () {
-                               controller.saveQRCodeImage();
+                                controller.saveQRCodeImage();
                               },
                               icon: const Icon(Icons.save_alt),
                               label: const Text('Save'),
@@ -124,7 +128,7 @@ class DetailsPage extends GetView<DetailsController> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                               controller.shareQRCodeImage();
+                                controller.shareQRCodeImage();
                               },
                               icon: const Icon(Icons.share),
                               label: const Text('Share'),
@@ -139,7 +143,7 @@ class DetailsPage extends GetView<DetailsController> {
                             ),
                             ElevatedButton.icon(
                               onPressed: () {
-                              controller.copyToClipboard();
+                                controller.copyToClipboard();
                               },
                               icon: const Icon(Icons.copy),
                               label: const Text('Copy'),

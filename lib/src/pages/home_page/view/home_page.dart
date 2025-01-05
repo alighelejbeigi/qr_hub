@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../../qr_hub.dart';
 import '../controller/home_page_controller.dart';
 
 class HomePage extends GetView<HomePageController> {
