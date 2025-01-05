@@ -10,6 +10,7 @@ class HomePage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
+    backgroundColor: const Color(0xff868686),
         appBar: _buildAppBar(context),
         body: _buildBody(),
         bottomNavigationBar: _buildBottomNavigationBar(context),
@@ -22,12 +23,12 @@ class HomePage extends GetView<HomePageController> {
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xffFDB624),
         title:  Obx(() => controller.titles[controller.selectedIndex.value]),
-        actions: [
-          /* IconButton(
+        /*actions: [
+           IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => context.push(RouteNames.settingPage),
-        ),*/
-        ],
+        ),
+        ],*/
       );
 
   // Body Method

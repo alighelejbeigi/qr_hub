@@ -7,7 +7,7 @@ class GeneratePage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xffF5F5F5),
+        backgroundColor: const Color(0xff868686),
         body: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),

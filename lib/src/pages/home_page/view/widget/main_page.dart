@@ -13,7 +13,6 @@ class MainPage extends GetView<HomePageController> {
         children: [
           _buildCameraPreview(),
           _buildActionButtons(context),
-          //_buildQRCodeResult(),
         ],
       );
 
@@ -112,22 +111,4 @@ class MainPage extends GetView<HomePageController> {
           ),
         ));
   }
-
-/*  // QR Code Result Method
-  Widget _buildQRCodeResult() {
-    return Positioned(
-      top: 16,
-      left: 16,
-      right: 16,
-      child: Obx(() => Text(
-            controller.qrCodeResult.value,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white,
-              backgroundColor: Colors.black54,
-              fontSize: 16,
-            ),
-          )),
-    );
-  }*/
 }

@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
@@ -19,12 +20,19 @@ import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
   final TextEditingController textController = TextEditingController();
-  Rx<Widget> result = Rx<Widget>(const SizedBox());
   final qrGenerator = EasyQRCodeGenerator();
   Rx<Uint8List> imageBytes = Rx<Uint8List>(SampleQr().sample);
   Uint8List? imageBytesForSave;
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
+  Rx<CameraController?> cameraController = Rx<CameraController?>(null);
+  late List<CameraDescription> cameras;
+  //RxString qrCodeResult = ''.obs;
+  RxBool isCameraReady = false.obs;
+  RxBool isFlashSupported = false.obs;
+  RxInt selectedCameraIndex = 0.obs;
+  bool isSwitchCamera = false;
+  final uuid = const Uuid();
 
   final pages = [
     const HistoryPage(),
@@ -33,23 +41,16 @@ class HomePageController extends GetxController {
   ];
 
   final titles = [
-    const Text('History Page'),
-    const Text('Generate'),
+    const Text('History'),
+    const Text('Generate QR'),
     const Text('QR Hub'),
   ];
 
-  Rx<CameraController?> cameraController = Rx<CameraController?>(null);
-  late List<CameraDescription> cameras;
-  RxString qrCodeResult = ''.obs;
-  RxBool isCameraReady = false.obs;
-  RxBool isFlashSupported = false.obs;
-  RxInt selectedCameraIndex = 0.obs;
-  bool isSwitchCamera = false;
+
 
   @override
   void onInit() {
     super.onInit();
-    //textController.text = 'QR HUB';
     initializeCamera();
   }
 
@@ -68,8 +69,8 @@ class HomePageController extends GetxController {
       final cameraPermission = await Permission.camera.request();
 
       if (!cameraPermission.isGranted) {
-        qrCodeResult.value =
-            'دسترسی به دوربین لازم است تا این عملیات انجام شود.';
+        _showSnackBar('دسترسی به دوربین لازم است تا این عملیات انجام شود.');
+
         return;
       }
 
@@ -77,7 +78,8 @@ class HomePageController extends GetxController {
       if (cameras.isNotEmpty) {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
-        qrCodeResult.value = 'دوربینی در دسترس نیست.';
+        _showSnackBar('دوربینی در دسترس نیست.');
+
       }
     } catch (e) {
       handleError(e);
@@ -87,7 +89,8 @@ class HomePageController extends GetxController {
   Future<void> toggleFlash() async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      qrCodeResult.value = 'دوربین آماده نیست.';
+      _showSnackBar( 'دوربین آماده نیست.');
+
       return;
     }
 
@@ -100,10 +103,12 @@ class HomePageController extends GetxController {
           isFlashOn.value ? FlashMode.torch : FlashMode.off,
         );
       } else {
-        qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
+        _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+
       }
     } catch (e) {
-      qrCodeResult.value = 'این دستگاه از فلاش پشتیبانی نمی‌کند.';
+      _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+
     }
   }
 
@@ -139,7 +144,7 @@ class HomePageController extends GetxController {
     }
   }
 
-  final uuid = const Uuid();
+
 
   Future<void> saveHistoryRead(String result) async {
     final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
@@ -154,6 +159,7 @@ class HomePageController extends GetxController {
 
     // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
     await box.put(newHistory.id, newHistory);
+
   }
 
   Future<void> deleteHistory(String id) async {
@@ -162,12 +168,14 @@ class HomePageController extends GetxController {
   }
 
   Future<void> deleteHistoryGeneration(String id) async {
-    final box2 = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
+    final box2 =
+        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
     await box2.delete(id);
   }
 
   Future<void> saveHistoryGeneration(String result) async {
-    final box = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
+    final box =
+        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
 
     // ایجاد آیتم جدید با ID یکتا
     final newHistory = QrCodeGenerateHistory(
@@ -187,7 +195,9 @@ class HomePageController extends GetxController {
   }
 
   Future<List<QrCodeGenerateHistory>> getAllGenerationHistory() async {
-    final box = await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
+    final box =
+        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
+
     return box.values.toList();
   }
 
@@ -331,7 +341,8 @@ class HomePageController extends GetxController {
     if (cameras.length > 1) {
       isSwitchCamera = true;
       isCameraReady.value = false;
-      qrCodeResult.value = 'در حال تغییر دوربین...';
+
+      _showSnackBar('در حال تغییر دوربین...');
       try {
         selectedCameraIndex.value =
             (selectedCameraIndex.value + 1) % cameras.length;
@@ -340,11 +351,13 @@ class HomePageController extends GetxController {
         handleError(e);
       } finally {
         isCameraReady.value = true;
-        qrCodeResult.value = '';
+        _showSnackBar('');
+
         isSwitchCamera = false;
       }
     } else {
-      qrCodeResult.value = 'فقط یک دوربین در دسترس است.';
+_showSnackBar('فقط یک دوربین در دسترس است.');
+
     }
   }
 
@@ -358,8 +371,7 @@ class HomePageController extends GetxController {
     }
   }
 
-
-  void showDeleteDialog(BuildContext context,String id,bool isScanHistory ) {
+  void showDeleteDialog(BuildContext context, String id, bool isScanHistory) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -375,14 +387,15 @@ class HomePageController extends GetxController {
             ),
             TextButton(
               onPressed: () async {
-               if (isScanHistory) {
-                 await deleteHistory(id);
-               }else{
-                await deleteHistoryGeneration(id);
-               }
-               if (!context.mounted) return;
-               _showSnackBar(context, "Item deleted!");
-               Get.forceAppUpdate();
+                if (isScanHistory) {
+                  await deleteHistory(id);
+                } else {
+                  await deleteHistoryGeneration(id);
+                }
+                if (!context.mounted) return;
+
+                _showSnackBar( "Item deleted!");
+                Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('Delete'),
@@ -392,9 +405,17 @@ class HomePageController extends GetxController {
       },
     );
   }
-  void _showSnackBar(BuildContext context, String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
+
+  void _showSnackBar( String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
   }
 
   Future<Uint8List?> convertImageToBytes(ui.Image image) async {
@@ -413,6 +434,6 @@ class HomePageController extends GetxController {
   }
 
   void handleError(dynamic e) {
-    qrCodeResult.value = 'خطایی رخ داده است: $e';
+    _showSnackBar('خطایی رخ داده است: $e');
   }
 }

@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../../qr_hub.dart';
+import '../../../shared/enum/qr_code_enum.dart';
 import '../../controller/home_page_controller.dart';
 
 class HistoryPage extends GetView<HomePageController> {
@@ -54,31 +56,31 @@ class HistoryPage extends GetView<HomePageController> {
                     future: controller.getAllHistory(),
                     itemBuilder: (context, history) {
                       return _buildHistoryTile(
-                        history,
-                        history.text,
-                        history.date,
-                        history.photo,
-                        () async {
-                          controller.showDeleteDialog(context,history.id,true);
-
-                        },
-                      );
+                          history: history,
+                          context: context,
+                          onDelete: () async {
+                            controller.showDeleteDialog(
+                              context,
+                              history.id,
+                              true,
+                            );
+                          });
                     },
                   ),
                   // Tab 2: Show Generated QR Codes History
                   _buildHistoryList<QrCodeGenerateHistory>(
                     future: controller.getAllGenerationHistory(),
                     itemBuilder: (context, history) {
-                      return _buildHistoryTile(
-                        history,
-                        history.text,
-                        history.date,
-                        history.photo,
-                        () async {
-                           controller.showDeleteDialog(context,history.id,false);
-
-                        },
-                      );
+                      return _buildHistoryGenerationTile(
+                          history: history,
+                          onDelete: () async {
+                            controller.showDeleteDialog(
+                              context,
+                              history.id,
+                              false,
+                            );
+                          },
+                          context: context);
                     },
                   ),
                 ],
@@ -120,52 +122,99 @@ class HistoryPage extends GetView<HomePageController> {
   }
 
   // Helper method to build a ListTile for each history entry
-  Widget _buildHistoryTile(
-    dynamic history,
-    String text,
-    DateTime date,
-    Uint8List? photo,
-    VoidCallback onDelete,
-  ) {
-    final formattedDate = DateFormat('yyyy/MM/dd – HH:mm:ss').format(date);
+  Widget _buildHistoryTile({
+    required final QrCodeScanHistory history,
+    required VoidCallback onDelete,
+    required BuildContext context,
+  }) {
+    final formattedDate =
+        DateFormat('yyyy/MM/dd – HH:mm:ss').format(history.date);
 
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-      color: const Color(0xff444444),
-      // Slightly lighter background for list tile
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(12),
-        title: Text(
-          text,
-          style: const TextStyle(color: Colors.white),
+    return GestureDetector(
+      onTap: () => context.push(
+          '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.scanQRCode.id}'),
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        color: const Color(0xff444444),
+        // Slightly lighter background for list tile
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-        subtitle: Text(
-          formattedDate,
-          style: const TextStyle(color: Colors.grey),
-        ),
-        leading: photo != null
-            ? ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Image.memory(photo,
-                    width: 50, height: 50, fit: BoxFit.cover),
-              )
-            : const Icon(
-                Icons.image,
-                color: Colors.white,
-              ),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: onDelete,
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(12),
+          title: Text(
+            history.text,
+            style: const TextStyle(color: Colors.white),
+          ),
+          subtitle: Text(
+            formattedDate,
+            style: const TextStyle(color: Colors.grey),
+          ),
+          leading: history.photo != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(history.photo!,
+                      width: 50, height: 50, fit: BoxFit.cover),
+                )
+              : const Icon(
+                  Icons.image,
+                  color: Colors.white,
+                ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: onDelete,
+          ),
         ),
       ),
     );
   }
 
-  // Show a SnackBar with a message
+  Widget _buildHistoryGenerationTile({
+    required final QrCodeGenerateHistory history,
+    required VoidCallback onDelete,
+    required BuildContext context,
+  }) {
+    final formattedDate =
+        DateFormat('yyyy/MM/dd – HH:mm:ss').format(history.date);
 
+    return GestureDetector(
+      onTap: () => context.push(
+          '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.createQRCode.id}'),
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        color: const Color(0xff444444),
+        // Slightly lighter background for list tile
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.all(12),
+          title: Text(
+            history.text,
+            style: const TextStyle(color: Colors.white),
+          ),
+          subtitle: Text(
+            formattedDate,
+            style: const TextStyle(color: Colors.grey),
+          ),
+          leading: history.photo != null
+              ? ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.memory(history.photo!,
+                      width: 50, height: 50, fit: BoxFit.cover),
+                )
+              : const Icon(
+                  Icons.image,
+                  color: Colors.white,
+                ),
+          trailing: IconButton(
+            icon: const Icon(Icons.delete, color: Colors.red),
+            onPressed: onDelete,
+          ),
+        ),
+      ),
+    );
+  }
+
+// Show a SnackBar with a message
 }
-
-
