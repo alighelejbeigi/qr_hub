@@ -8,7 +8,7 @@ class HomePage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    backgroundColor: const Color(0xff868686),
+        backgroundColor: const Color(0xff868686),
         appBar: _buildAppBar(context),
         body: _buildBody(),
         bottomNavigationBar: _buildBottomNavigationBar(context),
@@ -20,13 +20,20 @@ class HomePage extends GetView<HomePageController> {
   AppBar _buildAppBar(BuildContext context) => AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xffFDB624),
-        title:  Obx(() => controller.titles[controller.selectedIndex.value]),
-        /*actions: [
-           IconButton(
+        title: Obx(() => controller.titles[controller.selectedIndex.value]),
+        actions: [
+          /*  IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => context.push(RouteNames.settingPage),
-        ),
-        ],*/
+        ),*/
+          if (controller.selectedIndex.value == 0)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () {
+                controller.showDeleteAllDialog(context);
+              },
+            ),
+        ],
       );
 
   // Body Method
@@ -124,4 +131,3 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 }
-

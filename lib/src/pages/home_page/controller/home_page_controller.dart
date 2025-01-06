@@ -13,7 +13,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
-import '../models/sample_qr.dart';
 import '../view/widget/generate_page.dart';
 import '../view/widget/history_page.dart';
 import '../view/widget/main_page.dart';
@@ -21,7 +20,7 @@ import '../view/widget/main_page.dart';
 class HomePageController extends GetxController {
   final TextEditingController textController = TextEditingController();
   final qrGenerator = EasyQRCodeGenerator();
-  Rx<Uint8List> imageBytes = Rx<Uint8List>(SampleQr().sample);
+  Rxn<Uint8List> imageBytes = Rxn();
   Uint8List? imageBytesForSave;
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
@@ -360,9 +359,53 @@ class HomePageController extends GetxController {
     if (data.isNotEmpty) {
       final qrWidget = await qrGenerator.generateQRCodeImage(data: data);
       final bytes = await convertImageToBytes(qrWidget);
-      imageBytes.value = bytes!;
-      saveHistoryGeneration(data);
+      if (bytes != null) {
+        imageBytes.value = bytes;
+        saveHistoryGeneration(data);
+      } else {
+        return;
+      }
     }
+  }
+
+  Future<void> deleteAllHistory() async {
+    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
+    await box.clear();
+    final box2 =
+        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
+    await box2.clear();
+  }
+
+  void showDeleteAllDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete all'),
+          content: const Text('Are you sure you want to delete?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                await deleteAllHistory();
+                if (!context.mounted) return;
+                getAllHistory();
+                generateQRCode();
+                _showSuccesSnackBar('همه ایتم ها پاک شد');
+                Get.forceAppUpdate();
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void showDeleteDialog(BuildContext context, String id, bool isScanHistory) {
@@ -388,7 +431,7 @@ class HomePageController extends GetxController {
                 }
                 if (!context.mounted) return;
 
-                _showSnackBar("Item deleted!");
+                _showSuccesSnackBar("Item deleted!");
                 Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
@@ -411,6 +454,17 @@ class HomePageController extends GetxController {
         fontSize: 16.0);
   }
 
+  void _showSuccesSnackBar(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
+
   Future<Uint8List?> convertImageToBytes(ui.Image image) async {
     final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     return byteData?.buffer.asUint8List();
@@ -418,12 +472,13 @@ class HomePageController extends GetxController {
 
   // Method to save generated QR code image
   Future<void> saveQRCodeImage() async {
-    qrGenerator.saveQRCodeFromBytes(qrBytes: imageBytes.value);
+    qrGenerator.saveQRCodeFromBytes(qrBytes: imageBytes.value!);
+    _showSuccesSnackBar('در دانلود ها ذخیره شد');
   }
 
   // Method to share generated QR code image
   Future<void> shareQRCodeImage() async {
-    qrGenerator.shareQRCodeFromBytes(qrBytes: imageBytes.value);
+    qrGenerator.shareQRCodeFromBytes(qrBytes: imageBytes.value!);
   }
 
   void handleError(dynamic e) {

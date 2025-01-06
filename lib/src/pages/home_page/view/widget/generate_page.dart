@@ -21,15 +21,37 @@ class GeneratePage extends GetView<HomePageController> {
 
                   _buildGenerateQRCodeButton(),
                   const SizedBox(height: 24),
-
-                  Obx(
-                    () => controller.imageBytes.value.isNotEmpty
-                        ? Image.memory(controller.imageBytes.value)
-                        : const SizedBox.shrink(),
+                  Row(
+                    children: [
+                      Obx(
+                        () => controller.imageBytes.value != null
+                            ? Expanded(
+                                child: Container(
+                                  padding: const EdgeInsets.all(16.0),
+                                  decoration: _containerDecoration(),
+                                  child: Image.memory(
+                                    controller.imageBytes.value!,
+                                    height: 200,
+                                    width: 200,
+                                    fit: BoxFit.contain,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.error, size: 50),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
+                      )
+                    ],
                   ),
+
                   const SizedBox(height: 24),
                   // Save and Share Buttons
-                  _buildSaveAndShareButtons(),
+                  Obx(
+                    () => controller.imageBytes.value != null
+                        ? _buildSaveAndShareButtons()
+                        : const SizedBox.shrink(),
+                  ),
                 ],
               ),
             ),
@@ -37,42 +59,54 @@ class GeneratePage extends GetView<HomePageController> {
         ),
       );
 
+  BoxDecoration _containerDecoration() {
+    return BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12.0),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withAlpha((0.1 * 255).toInt()),
+          blurRadius: 10,
+          offset: const Offset(0, 4),
+        ),
+      ],
+    );
+  }
+
   Widget _buildSaveAndShareButtons() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        _buildSaveShareButton(
-          icon: Icons.save,
-          tooltip: 'Save QR Code',
+        _buildButton(
+          label: 'Save',
+          icon: Icons.save_alt,
           onPressed: controller.saveQRCodeImage,
         ),
-        const SizedBox(width: 20),
-        _buildSaveShareButton(
+        const SizedBox(width: 10),
+        _buildButton(
+          label: 'Share',
           icon: Icons.share,
-          tooltip: 'Share QR Code',
           onPressed: controller.shareQRCodeImage,
         ),
       ],
     );
   }
 
-  Widget _buildSaveShareButton({
+  Widget _buildButton({
+    required String label,
     required IconData icon,
-    required String tooltip,
     required VoidCallback onPressed,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xffFDB624),
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(icon, color: const Color(0xff333333)),
-        // White icon
-        tooltip: tooltip,
-        iconSize: 25,
-        padding: const EdgeInsets.all(8),
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon),
+      label: Text(label),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xffFDB624),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
       ),
     );
   }
@@ -92,6 +126,9 @@ class GeneratePage extends GetView<HomePageController> {
       ),
       child: TextField(
         controller: controller.textController,
+        onChanged: (value) {
+          Get.forceAppUpdate();
+        },
         decoration: InputDecoration(
           labelText: 'Enter data for QR Code',
           labelStyle: TextStyle(
@@ -112,7 +149,9 @@ class GeneratePage extends GetView<HomePageController> {
   // Button to generate the QR Code
   Widget _buildGenerateQRCodeButton() {
     return ElevatedButton(
-      onPressed: () => controller.generateQRCode(),
+      onPressed: controller.textController.text.isNotEmpty
+          ? () => controller.generateQRCode()
+          : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xffFDB624),
         // Primary color for the button

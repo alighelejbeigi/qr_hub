@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../qr_hub.dart';
 
@@ -49,8 +50,10 @@ class DetailsController extends GetxController {
   Future<void> saveQRCodeImage() async {
     if (type == '1') {
       qrGenerator.saveQRCodeFromBytes(qrBytes: itemGenerait!.photo!);
+      _showSnackBar('در دانلود ها ذخیره شد');
     } else {
       qrGenerator.saveQRCodeFromBytes(qrBytes: itemScan!.photo!);
+      _showSnackBar('در دانلود ها ذخیره شد');
     }
   }
 
@@ -75,6 +78,20 @@ class DetailsController extends GetxController {
     );
   }
 
+  bool isValidUrl(String url) {
+    const urlPattern = r'^(https?:\/\/)?'
+        r'(([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6})'
+        r'(\/[^\s]*)?$';
+    final regex = RegExp(urlPattern);
+    return regex.hasMatch(url);
+  }
+
+  Future<void> launchURL(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
 
   // Method to share generated QR code image
   Future<void> shareQRCodeImage() async {

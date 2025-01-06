@@ -73,11 +73,32 @@ class DetailsPage extends GetView<DetailsController> {
             ),
           ),
           const SizedBox(height: 8.0),
-          Text(
+          clickableResultText(qrCodeData),
+          /*Text(
             qrCodeData,
             style: const TextStyle(fontSize: 16),
-          ),
+          ),*/
         ],
+      ),
+    );
+  }
+
+  Widget clickableResultText(String result) {
+    bool isValidUrls = controller.isValidUrl(result);
+    return GestureDetector(
+      onTap: () {
+        if (isValidUrls) {
+          controller.launchURL(result);
+        }
+      },
+      child: Text(
+        result,
+        style: TextStyle(
+          color: isValidUrls ? Colors.blue : Colors.white,
+          decoration:
+          isValidUrls ? TextDecoration.underline : TextDecoration.none,
+          fontSize: 16
+        ),
       ),
     );
   }

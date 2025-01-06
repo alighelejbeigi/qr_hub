@@ -34,3 +34,4 @@ build/
 /example/ios/Podfile.lock
 /lib/src/pages/home_page/models/qr_code_generate_history.g.dart
 /lib/src/pages/home_page/models/qr_code_scan_history.g.dart
+/example/macos/Podfile.lock
