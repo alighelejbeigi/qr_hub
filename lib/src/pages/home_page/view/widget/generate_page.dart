@@ -78,13 +78,13 @@ class GeneratePage extends GetView<HomePageController> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         _buildButton(
-          label: 'Save',
+          label: 'ذخیره',
           icon: Icons.save_alt,
           onPressed: controller.saveQRCodeImage,
         ),
         const SizedBox(width: 10),
         _buildButton(
-          label: 'Share',
+          label: 'اشتراک ‌گذاری',
           icon: Icons.share,
           onPressed: controller.shareQRCodeImage,
         ),
@@ -130,7 +130,7 @@ class GeneratePage extends GetView<HomePageController> {
           Get.forceAppUpdate();
         },
         decoration: InputDecoration(
-          labelText: 'Enter data for QR Code',
+          labelText: 'متن خود را برای ساخت کد QR وارد کنید',
           labelStyle: TextStyle(
             color: Colors.grey[600],
             fontWeight: FontWeight.bold,
@@ -162,7 +162,7 @@ class GeneratePage extends GetView<HomePageController> {
         elevation: 5,
       ),
       child: const Text(
-        'Generate QR Code',
+        'ساخت کد QR',
         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );

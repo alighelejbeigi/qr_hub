@@ -69,7 +69,7 @@ class MainPage extends GetView<HomePageController> {
   // Gallery Button Method
   Widget _buildPickGalleryButton(BuildContext context) {
     return FloatingActionButton(
-      heroTag: 'pickGalleryImage',
+      heroTag: 'یک تصویر را از گالری انتخاب کنید',
       backgroundColor: const Color(0xffFDB624),
       onPressed: () => controller.pickImageFromGallery(context),
       child: const Icon(Icons.image, color: Colors.white),
@@ -79,7 +79,7 @@ class MainPage extends GetView<HomePageController> {
   // Capture QR Code Button Method
   Widget _buildCaptureQRCodeButton(BuildContext context) {
     return FloatingActionButton(
-      heroTag: 'captureQRCode',
+      heroTag: 'از کد QR عکس بگیرید',
       backgroundColor: const Color(0xffFDB624),
       onPressed: () => controller.captureAndDecodeQRCode(context),
       child: const Icon(Icons.camera_alt, color: Colors.white),
@@ -89,7 +89,7 @@ class MainPage extends GetView<HomePageController> {
   // Switch Camera Button Method
   Widget _buildSwitchCameraButton() {
     return FloatingActionButton(
-      heroTag: 'switchCamera',
+      heroTag: 'دوربین را عوض کنید',
       backgroundColor: const Color(0xffFDB624),
       onPressed: controller.switchCamera,
       child: const Icon(Icons.switch_camera, color: Colors.white),
@@ -99,7 +99,7 @@ class MainPage extends GetView<HomePageController> {
   // Flashlight Button Method
   Widget _buildFlashlightButton() {
     return Obx(() => FloatingActionButton(
-          heroTag: 'flashlight',
+          heroTag: 'چراغ قوه را روشن کنید',
           backgroundColor: controller.isFlashSupported.value
               ? const Color(0xffFDB624)
               : const Color(0xffb6b6b3),

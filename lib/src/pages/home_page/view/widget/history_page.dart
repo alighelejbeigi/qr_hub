@@ -40,8 +40,8 @@ class HistoryPage extends GetView<HomePageController> {
                   dividerHeight: 0,
                   // Disable the bottom indicator or selection highlight
                   tabs: [
-                    Tab(text: 'Scanned QR Codes'), // Tab 1
-                    Tab(text: 'Generated QR Codes'), // Tab 2
+                    Tab(text: 'کد های QR اسکن شده'), // Tab 1
+                    Tab(text: 'کد های QR ساخته شده'), // Tab 2
                   ],
                 ),
               ),
@@ -104,7 +104,7 @@ class HistoryPage extends GetView<HomePageController> {
         }
 
         if (snapshot.hasError) {
-          return Center(child: Text("Error: ${snapshot.error}"));
+          return Center(child: Text("اررور: ${snapshot.error}"));
         }
 
         final historyList = snapshot.data ?? [];

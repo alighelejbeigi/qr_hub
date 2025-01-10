@@ -41,9 +41,9 @@ class HomePageController extends GetxController {
   ];
 
   final titles = [
-    const Text('History'),
-    const Text('Generate QR'),
-    const Text('QR Hub'),
+    const Text('تاریخچه QR'),
+    const Text('ساخت کد QR'),
+    const Text('QR هاب'),
   ];
 
   @override
@@ -249,7 +249,7 @@ class HomePageController extends GetxController {
   Future<void> _launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
+      throw Exception(' امکان باز کردن این$url وجود ندارد ');
     }
   }
 
@@ -297,10 +297,10 @@ class HomePageController extends GetxController {
         if (!context.mounted) return;
         showResultDialog(context, decodedResult);
       } else {
-        _showSnackBar('QR code یافت نشد.');
+        _showSnackBar(' کد QR یافت نشد');
       }
     } catch (e) {
-      _showSnackBar('خطا در اسکن QR Code: $e');
+      _showSnackBar('خطا در اسکن کد QR: $e');
     }
   }
 
@@ -317,7 +317,7 @@ class HomePageController extends GetxController {
           if (!context.mounted) return;
           showResultDialog(context, decodedResult);
         } else {
-          _showSnackBar('QR code یافت نشد.');
+          _showSnackBar('کد QR یافت نشد');
         }
       } else {
         _showSnackBar('تصویری انتخاب نشد.');
@@ -381,14 +381,14 @@ class HomePageController extends GetxController {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete all'),
-          content: const Text('Are you sure you want to delete?'),
+          title: const Text('حذف همه QR ها'),
+          content: const Text('آیا مطمئن هستید که می خواهید حذف کنید؟'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text('لغو'),
             ),
             TextButton(
               onPressed: () async {
@@ -396,11 +396,11 @@ class HomePageController extends GetxController {
                 if (!context.mounted) return;
                 getAllHistory();
                 generateQRCode();
-                _showSuccesSnackBar('همه ایتم ها پاک شد');
+                _showSuccesSnackBar('همه QR کد ها پاک شد');
                 Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
-              child: const Text('Delete'),
+              child: const Text('حذف'),
             ),
           ],
         );
@@ -413,14 +413,14 @@ class HomePageController extends GetxController {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Delete Item'),
-          content: const Text('Are you sure you want to delete?'),
+          title: const Text('حذف یک مورد'),
+          content: const Text('آیا مطمئن هستید که می خواهید حذف کنید؟'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text('Cancel'),
+              child: const Text('لغو'),
             ),
             TextButton(
               onPressed: () async {
@@ -431,11 +431,11 @@ class HomePageController extends GetxController {
                 }
                 if (!context.mounted) return;
 
-                _showSuccesSnackBar("Item deleted!");
+                _showSuccesSnackBar("مورد انتخابی حذف شد");
                 Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
-              child: const Text('Delete'),
+              child: const Text('حذف'),
             ),
           ],
         );

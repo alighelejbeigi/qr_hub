@@ -32,7 +32,7 @@ class DetailsPage extends GetView<DetailsController> {
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xffFDB624),
-      title: const Text('QR Code Details'),
+      title: const Text('جزئیات کد QR'),
     );
   }
 
@@ -56,8 +56,8 @@ class DetailsPage extends GetView<DetailsController> {
   /// Builds the data section widget
   Widget _buildDataSection() {
     final qrCodeData = _qrCodeScan()
-        ? controller.itemScan?.text ?? 'No data available.'
-        : controller.itemGenerait?.text ?? 'No data available.';
+        ? controller.itemScan?.text ?? 'اطلاعاتی وجود ندارد'
+        : controller.itemGenerait?.text ?? 'اطلاعاتی وجود ندارد';
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -66,7 +66,7 @@ class DetailsPage extends GetView<DetailsController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Data:',
+            'اطلاعات کد QR:',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
@@ -94,7 +94,7 @@ class DetailsPage extends GetView<DetailsController> {
       child: Text(
         result,
         style: TextStyle(
-          color: isValidUrls ? Colors.blue : Colors.white,
+          color: isValidUrls ? Colors.blue : Colors.black,
           decoration:
           isValidUrls ? TextDecoration.underline : TextDecoration.none,
           fontSize: 16
@@ -129,17 +129,17 @@ class DetailsPage extends GetView<DetailsController> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         _buildButton(
-          label: 'Save',
+          label: 'ذخیره',
           icon: Icons.save_alt,
           onPressed: controller.saveQRCodeImage,
         ),
         _buildButton(
-          label: 'Share',
+          label: 'اشتراک گذاری',
           icon: Icons.share,
           onPressed: controller.shareQRCodeImage,
         ),
         _buildButton(
-          label: 'Copy',
+          label: 'کپی',
           icon: Icons.copy,
           onPressed: controller.copyToClipboard,
         ),

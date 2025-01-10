@@ -17,14 +17,13 @@ class MyApp extends StatelessWidget {
         supportedLocales: const [
           Locale('en', 'US'),
           Locale('fa', 'IR')
-          // Add more supported locales if needed
         ],
-      /*  builder: (context, child) {
+        builder: (context, child) {
           return Directionality(
-            textDirection: TextDirection.ltr,
+            textDirection: TextDirection.rtl,
             child: child!,
           );
-        },*/
+        },
         routerConfig: RoutePages.router,
       );
 }

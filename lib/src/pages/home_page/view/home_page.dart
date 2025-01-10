@@ -50,7 +50,7 @@ class HomePage extends GetView<HomePageController> {
           children: [
             _buildBottomBarButton(
               context: context,
-              label: 'Generate',
+              label: 'ساخت کد',
               icon: Icons.qr_code_2,
               isSelected: controller.selectedIndex.value == 1,
               onTap: () {
@@ -58,10 +58,10 @@ class HomePage extends GetView<HomePageController> {
                 Get.forceAppUpdate();
               },
             ),
-            const SizedBox(width: 58),
+            const SizedBox(width: 50),
             _buildBottomBarButton(
               context: context,
-              label: 'History',
+              label: 'تاریخچه',
               icon: Icons.history,
               isSelected: controller.selectedIndex.value == 0,
               onTap: () {
@@ -88,7 +88,7 @@ class HomePage extends GetView<HomePageController> {
         decoration: BoxDecoration(
           border: isSelected
               ? const Border(
-                  bottom: BorderSide(color: Color(0xffFDB624), width: 3),
+                  bottom: BorderSide(color: Color(0xffFDB624), width: 2),
                 )
               : null,
         ),
@@ -103,6 +103,7 @@ class HomePage extends GetView<HomePageController> {
               label,
               style: TextStyle(
                 color: isSelected ? const Color(0xffFDB624) : Colors.white,
+
               ),
             ),
           ],
