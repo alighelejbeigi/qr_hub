@@ -14,7 +14,7 @@ class MainPage extends GetView<HomePageController> {
           final currentController = controller.cameraController.value;
           if (controller.isCameraReady.value &&
               currentController != null &&
-              currentController.value.isInitialized) {
+              currentController.value.isInitialized && !controller.isLoading.value) {
             return Column(
               children: [
                 Expanded(

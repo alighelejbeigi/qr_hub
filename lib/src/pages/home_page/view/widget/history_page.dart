@@ -40,8 +40,8 @@ class HistoryPage extends GetView<HomePageController> {
                   dividerHeight: 0,
                   // Disable the bottom indicator or selection highlight
                   tabs: [
-                    Tab(text: 'کد های QR اسکن شده'), // Tab 1
-                    Tab(text: 'کد های QR ساخته شده'), // Tab 2
+                    Tab(text: 'کد های اسکن شده'), // Tab 1
+                    Tab(text: 'کد های ساخته شده'), // Tab 2
                   ],
                 ),
               ),

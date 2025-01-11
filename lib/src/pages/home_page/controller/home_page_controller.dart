@@ -8,9 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
-
 import 'package:image_picker/image_picker.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -33,6 +31,7 @@ class HomePageController extends GetxController {
   //RxString qrCodeResult = ''.obs;
   RxBool isCameraReady = false.obs;
   RxBool isFlashSupported = false.obs;
+  RxBool isLoading = false.obs;
   RxInt selectedCameraIndex = 0.obs;
   bool isSwitchCamera = false;
   final uuid = const Uuid();
@@ -285,12 +284,12 @@ class HomePageController extends GetxController {
   }
 
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
+    isLoading.value = true;
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
       _showFaildSnackBar('دوربین آماده نیست.');
       return;
     }
-
     try {
       final XFile picture = await cameraController.value!.takePicture();
       final bytes = await picture.readAsBytes();
@@ -300,15 +299,19 @@ class HomePageController extends GetxController {
       if (decodedResult != null) {
         if (!context.mounted) return;
         showResultDialog(context, decodedResult);
+        isLoading.value = false;
       } else {
         _showFaildSnackBar(' کد QR یافت نشد');
+        isLoading.value = false;
       }
     } catch (e) {
       _showFaildSnackBar('خطا در اسکن کد QR: $e');
+      isLoading.value = false;
     }
   }
 
   Future<void> pickImageFromGallery(BuildContext context) async {
+    isLoading.value = true;
     try {
       final pickedImage =
           await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -320,14 +323,18 @@ class HomePageController extends GetxController {
         if (decodedResult != null) {
           if (!context.mounted) return;
           showResultDialog(context, decodedResult);
+          isLoading.value = false;
         } else {
           _showFaildSnackBar('کد QR یافت نشد');
+          isLoading.value = false;
         }
       } else {
         _showFaildSnackBar('تصویری انتخاب نشد.');
+        isLoading.value = false;
       }
     } catch (e) {
       _showFaildSnackBar('خطا در انتخاب تصویر: $e');
+      isLoading.value = false;
     }
   }
 

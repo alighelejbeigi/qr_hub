@@ -6,53 +6,55 @@ class GeneratePage extends GetView<HomePageController> {
   const GeneratePage({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff868686),
-        body: SafeArea(
+  Widget build(BuildContext context) => Container(
+        color: const Color(0xff868686),
+        child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildTextField(),
-                  const SizedBox(height: 24),
-
-                  _buildGenerateQRCodeButton(),
-                  const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Obx(
-                        () => controller.imageBytes.value != null
-                            ? Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.all(16.0),
-                                  decoration: _containerDecoration(),
-                                  child: Image.memory(
-                                    controller.imageBytes.value!,
-                                    height: 200,
-                                    width: 200,
-                                    fit: BoxFit.contain,
-                                    errorBuilder:
-                                        (context, error, stackTrace) =>
-                                            const Icon(Icons.error, size: 50),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildTextField(),
+                    const SizedBox(height: 24),
+                
+                    _buildGenerateQRCodeButton(),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Obx(
+                          () => controller.imageBytes.value != null
+                              ? Expanded(
+                                  child: Container(
+                                    padding: const EdgeInsets.all(16.0),
+                                    decoration: _containerDecoration(),
+                                    child: Image.memory(
+                                      controller.imageBytes.value!,
+                                      height: 200,
+                                      width: 200,
+                                      fit: BoxFit.contain,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(Icons.error, size: 50),
+                                    ),
                                   ),
-                                ),
-                              )
-                            : const SizedBox.shrink(),
-                      )
-                    ],
-                  ),
-
-                  const SizedBox(height: 24),
-                  // Save and Share Buttons
-                  Obx(
-                    () => controller.imageBytes.value != null
-                        ? _buildSaveAndShareButtons()
-                        : const SizedBox.shrink(),
-                  ),
-                ],
+                                )
+                              : const SizedBox.shrink(),
+                        )
+                      ],
+                    ),
+                
+                    const SizedBox(height: 24),
+                    // Save and Share Buttons
+                    Obx(
+                      () => controller.imageBytes.value != null
+                          ? _buildSaveAndShareButtons()
+                          : const SizedBox.shrink(),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

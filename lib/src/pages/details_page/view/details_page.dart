@@ -7,20 +7,20 @@ class DetailsPage extends GetView<DetailsController> {
 
   @override
   Widget build(BuildContext context) => PopScope(
-    onPopInvokedWithResult: _handleOnPop,
-    child: Scaffold(
-      backgroundColor: const Color(0xff606060),
-      appBar: _buildAppBar(),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Obx(
+        onPopInvokedWithResult: _handleOnPop,
+        child: Scaffold(
+          backgroundColor: const Color(0xff606060),
+          appBar: _buildAppBar(),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Obx(
               () => controller.isLoading.value
-              ? const Center(child: CircularProgressIndicator())
-              : _buildContent(),
+                  ? const Center(child: CircularProgressIndicator())
+                  : _buildContent(),
+            ),
+          ),
         ),
-      ),
-    ),
-  );
+      );
 
   /// Handles the pop event
   Future<bool> _handleOnPop(bool didPop, dynamic result) async {
@@ -41,15 +41,19 @@ class DetailsPage extends GetView<DetailsController> {
 
   /// Builds the content of the page
   Widget _buildContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _buildDataSection(),
-        const SizedBox(height: 24.0),
-        _buildQRCodeImageSection(),
-        const SizedBox(height: 24.0),
-        _buildButtonsSection(),
-      ],
+    return SingleChildScrollView(
+      controller: ScrollController(),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildDataSection(),
+          const SizedBox(height: 24.0),
+          _buildQRCodeImageSection(),
+          const SizedBox(height: 24.0),
+          _buildButtonsSection(),
+        ],
+      ),
     );
   }
 
@@ -94,11 +98,10 @@ class DetailsPage extends GetView<DetailsController> {
       child: Text(
         result,
         style: TextStyle(
-          color: isValidUrls ? Colors.blue : Colors.black,
-          decoration:
-          isValidUrls ? TextDecoration.underline : TextDecoration.none,
-          fontSize: 16
-        ),
+            color: isValidUrls ? Colors.blue : Colors.black,
+            decoration:
+                isValidUrls ? TextDecoration.underline : TextDecoration.none,
+            fontSize: 16),
       ),
     );
   }
@@ -118,32 +121,38 @@ class DetailsPage extends GetView<DetailsController> {
         width: 200,
         fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) =>
-        const Icon(Icons.error, size: 50),
+            const Icon(Icons.error, size: 50),
       ),
     );
   }
 
   /// Builds the buttons section widget
   Widget _buildButtonsSection() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        _buildButton(
-          label: 'ذخیره',
-          icon: Icons.save_alt,
-          onPressed: controller.saveQRCodeToDownloads,
-        ),
-        _buildButton(
-          label: 'اشتراک گذاری',
-          icon: Icons.share,
-          onPressed: controller.shareQRCodeImage,
-        ),
-        _buildButton(
-          label: 'کپی',
-          icon: Icons.copy,
-          onPressed: controller.copyToClipboard,
-        ),
-      ],
+    return SingleChildScrollView(
+      controller: ScrollController(),
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          const SizedBox(width: 10),
+          _buildButton(
+            label: 'ذخیره',
+            icon: Icons.save_alt,
+            onPressed: controller.saveQRCodeToDownloads,
+          ),
+          const SizedBox(width: 10),
+          _buildButton(
+            label: 'اشتراک گذاری',
+            icon: Icons.share,
+            onPressed: controller.shareQRCodeImage,
+          ),
+          const SizedBox(width: 10),
+          _buildButton(
+            label: 'کپی',
+            icon: Icons.copy,
+            onPressed: controller.copyToClipboard,
+          ),
+        ],
+      ),
     );
   }
 
