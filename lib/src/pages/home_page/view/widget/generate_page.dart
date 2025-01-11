@@ -80,7 +80,7 @@ class GeneratePage extends GetView<HomePageController> {
         _buildButton(
           label: 'ذخیره',
           icon: Icons.save_alt,
-          onPressed: controller.saveQRCodeImage,
+          onPressed: controller.saveQRCodeToDownloads,
         ),
         const SizedBox(width: 10),
         _buildButton(

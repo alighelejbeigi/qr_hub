@@ -9,39 +9,34 @@ class MainPage extends GetView<HomePageController> {
   const MainPage({super.key});
 
   @override
-  Widget build(BuildContext context) => Stack(
-        children: [
-          _buildCameraPreview(),
-          _buildActionButtons(context),
-        ],
-      );
-
-  // Camera Preview Method
-  Widget _buildCameraPreview() {
-    return Obx(() {
-      final currentController = controller.cameraController.value;
-      if (controller.isCameraReady.value &&
-          currentController != null &&
-          currentController.value.isInitialized) {
-        return Column(
-          children: [
-            Expanded(
-              child: ClipPath(
-                clipper: BottomCircularNotchClipper(),
-                child: CameraPreview(currentController),
+  Widget build(BuildContext context) => Center(
+    child: Obx(() {
+          final currentController = controller.cameraController.value;
+          if (controller.isCameraReady.value &&
+              currentController != null &&
+              currentController.value.isInitialized) {
+            return Column(
+              children: [
+                Expanded(
+                  child: ClipPath(
+                    clipper: BottomCircularNotchClipper(),
+                    child: CameraPreview(
+                      currentController,
+                      child: _buildActionButtons(context),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation(Color(0xffFDB624)),
               ),
-            ),
-          ],
-        );
-      } else {
-        return const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation(Color(0xffFDB624)),
-          ),
-        );
-      }
-    });
-  }
+            );
+          }
+        }),
+  );
 
   // Action Buttons Method (Gallery, Capture, Switch Camera, Flashlight)
   Widget _buildActionButtons(BuildContext context) {

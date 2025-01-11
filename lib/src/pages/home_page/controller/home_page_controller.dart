@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
@@ -7,7 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
+
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -67,7 +70,8 @@ class HomePageController extends GetxController {
       final cameraPermission = await Permission.camera.request();
 
       if (!cameraPermission.isGranted) {
-        _showSnackBar('دسترسی به دوربین لازم است تا این عملیات انجام شود.');
+        _showFaildSnackBar(
+            'دسترسی به دوربین لازم است تا این عملیات انجام شود.');
 
         return;
       }
@@ -76,7 +80,7 @@ class HomePageController extends GetxController {
       if (cameras.isNotEmpty) {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
-        _showSnackBar('دوربینی در دسترس نیست.');
+        _showFaildSnackBar('دوربینی در دسترس نیست.');
       }
     } catch (e) {
       handleError(e);
@@ -86,7 +90,7 @@ class HomePageController extends GetxController {
   Future<void> toggleFlash() async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      _showSnackBar('دوربین آماده نیست.');
+      _showFaildSnackBar('دوربین آماده نیست.');
 
       return;
     }
@@ -100,10 +104,10 @@ class HomePageController extends GetxController {
           isFlashOn.value ? FlashMode.torch : FlashMode.off,
         );
       } else {
-        _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+        _showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
       }
     } catch (e) {
-      _showSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+      _showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
     }
   }
 
@@ -283,7 +287,7 @@ class HomePageController extends GetxController {
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      _showSnackBar('دوربین آماده نیست.');
+      _showFaildSnackBar('دوربین آماده نیست.');
       return;
     }
 
@@ -297,10 +301,10 @@ class HomePageController extends GetxController {
         if (!context.mounted) return;
         showResultDialog(context, decodedResult);
       } else {
-        _showSnackBar(' کد QR یافت نشد');
+        _showFaildSnackBar(' کد QR یافت نشد');
       }
     } catch (e) {
-      _showSnackBar('خطا در اسکن کد QR: $e');
+      _showFaildSnackBar('خطا در اسکن کد QR: $e');
     }
   }
 
@@ -317,13 +321,13 @@ class HomePageController extends GetxController {
           if (!context.mounted) return;
           showResultDialog(context, decodedResult);
         } else {
-          _showSnackBar('کد QR یافت نشد');
+          _showFaildSnackBar('کد QR یافت نشد');
         }
       } else {
-        _showSnackBar('تصویری انتخاب نشد.');
+        _showFaildSnackBar('تصویری انتخاب نشد.');
       }
     } catch (e) {
-      _showSnackBar('خطا در انتخاب تصویر: $e');
+      _showFaildSnackBar('خطا در انتخاب تصویر: $e');
     }
   }
 
@@ -336,7 +340,7 @@ class HomePageController extends GetxController {
       isSwitchCamera = true;
       isCameraReady.value = false;
 
-      _showSnackBar('در حال تغییر دوربین...');
+      _showFaildSnackBar('در حال تغییر دوربین...');
       try {
         selectedCameraIndex.value =
             (selectedCameraIndex.value + 1) % cameras.length;
@@ -345,12 +349,12 @@ class HomePageController extends GetxController {
         handleError(e);
       } finally {
         isCameraReady.value = true;
-        _showSnackBar('');
+        _showFaildSnackBar('');
 
         isSwitchCamera = false;
       }
     } else {
-      _showSnackBar('فقط یک دوربین در دسترس است.');
+      _showFaildSnackBar('فقط یک دوربین در دسترس است.');
     }
   }
 
@@ -443,7 +447,7 @@ class HomePageController extends GetxController {
     );
   }
 
-  void _showSnackBar(String message) {
+  void _showFaildSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
@@ -470,10 +474,21 @@ class HomePageController extends GetxController {
     return byteData?.buffer.asUint8List();
   }
 
-  // Method to save generated QR code image
-  Future<void> saveQRCodeImage() async {
-    qrGenerator.saveQRCodeFromBytes(qrBytes: imageBytes.value!);
-    _showSuccesSnackBar('در دانلود ها ذخیره شد');
+  Future<void> saveQRCodeToDownloads() async {
+    try {
+      var status = await Permission.storage.request();
+      if (!status.isGranted) {
+        _showFaildSnackBar('مجوز ذخیره سازی رد شد');
+        return;
+      }
+      final customDir = Directory('/storage/emulated/0/Download');
+      String filePath = '${customDir.path}/easyQrCode_${Uuid().v4()}.png';
+      final file = File(filePath);
+      await file.writeAsBytes(imageBytes.value!);
+      _showSuccesSnackBar('در دانلود ها ذخیره شد');
+    } catch (e) {
+      _showFaildSnackBar('خطا در ذخیره فایل');
+    }
   }
 
   // Method to share generated QR code image
@@ -482,6 +497,6 @@ class HomePageController extends GetxController {
   }
 
   void handleError(dynamic e) {
-    _showSnackBar('خطایی رخ داده است: $e');
+    _showFaildSnackBar('خطایی رخ داده است: $e');
   }
 }

@@ -131,7 +131,7 @@ class DetailsPage extends GetView<DetailsController> {
         _buildButton(
           label: 'ذخیره',
           icon: Icons.save_alt,
-          onPressed: controller.saveQRCodeImage,
+          onPressed: controller.saveQRCodeToDownloads,
         ),
         _buildButton(
           label: 'اشتراک گذاری',

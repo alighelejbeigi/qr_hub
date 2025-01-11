@@ -60,7 +60,7 @@ class SplashScreen extends GetView<SplashController> {
         right: 0,
         child: const Center(
           child: Text(
-            'version 0.1',
+            'version 1.0',
             style: TextStyle(
               color: Colors.white,
               fontSize: 16,
