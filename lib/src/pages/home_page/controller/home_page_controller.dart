@@ -120,6 +120,7 @@ class HomePageController extends GetxController {
       final newController = CameraController(
         camera,
         ResolutionPreset.medium,
+        enableAudio: false,
       );
 
       cameraController.value = newController;
