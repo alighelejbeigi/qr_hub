@@ -11,9 +11,9 @@ class HistoryPage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      length: 2, // Number of tabs
-      child: SafeArea(
+    return Center(
+      child: DefaultTabController(
+        length: 2, // Number of tabs
         child: Column(
           children: [
             const SizedBox(height: 16),

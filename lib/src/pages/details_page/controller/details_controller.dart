@@ -58,7 +58,7 @@ class DetailsController extends GetxController {
         return;
       }
       final customDir = Directory('/storage/emulated/0/Download');
-      String filePath = '${customDir.path}/easyQrCode_${Uuid().v4()}.png';
+      String filePath = '${customDir.path}/easyQrCode_${const Uuid().v4()}.png';
       final file = File(filePath);
       if (type == '1') {
         await file.writeAsBytes(itemGenerait!.photo!);

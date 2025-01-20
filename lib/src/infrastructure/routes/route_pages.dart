@@ -14,7 +14,7 @@ import 'route_names.dart';
 class RoutePages {
   static final GoRouter router = GoRouter(
     initialLocation: RouteNames.splashPage,
-    routes: [
+    routes: <RouteBase>[
       GoRoute(
         path: RouteNames.splashPage,
         pageBuilder: (context, state) {

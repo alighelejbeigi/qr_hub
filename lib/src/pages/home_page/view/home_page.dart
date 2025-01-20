@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr_hub/src/pages/home_page/view/widget/history_page.dart';
 
 import '../controller/home_page_controller.dart';
+import 'widget/generate_page.dart';
+import 'widget/main_page.dart';
 
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
@@ -10,11 +13,22 @@ class HomePage extends GetView<HomePageController> {
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: const Color(0xff868686),
         appBar: _buildAppBar(context),
-        body: _buildBody(),
+        body: Obx(()=>_mainBody()),
         bottomNavigationBar: _buildBottomNavigationBar(context),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: _buildFloatingButton(),
       );
+
+  Widget _mainBody() {
+
+    if (controller.selectedIndex.value == 2) {
+      return MainPage();
+    } else if (controller.selectedIndex.value == 0) {
+      return HistoryPage();
+    } else {
+      return GeneratePage();
+    }
+  }
 
   // AppBar Method
   AppBar _buildAppBar(BuildContext context) => AppBar(
@@ -36,10 +50,6 @@ class HomePage extends GetView<HomePageController> {
         ],
       );
 
-  // Body Method
-  Widget _buildBody() =>
-      Obx(() => controller.pages[controller.selectedIndex.value]);
-
   // Bottom Navigation Bar Method
   Widget _buildBottomNavigationBar(BuildContext context) => BottomAppBar(
         shape: const CircularNotchedRectangle(),
@@ -55,7 +65,7 @@ class HomePage extends GetView<HomePageController> {
               isSelected: controller.selectedIndex.value == 1,
               onTap: () {
                 controller.onTabTapped(1);
-                Get.forceAppUpdate();
+                //Get.forceAppUpdate();
               },
             ),
             const SizedBox(width: 50),
@@ -66,7 +76,7 @@ class HomePage extends GetView<HomePageController> {
               isSelected: controller.selectedIndex.value == 0,
               onTap: () {
                 controller.onTabTapped(0);
-                Get.forceAppUpdate();
+                //Get.forceAppUpdate();
               },
             ),
           ],
@@ -103,7 +113,6 @@ class HomePage extends GetView<HomePageController> {
               label,
               style: TextStyle(
                 color: isSelected ? const Color(0xffFDB624) : Colors.white,
-
               ),
             ),
           ],
@@ -116,7 +125,7 @@ class HomePage extends GetView<HomePageController> {
   Widget _buildFloatingButton() {
     return FloatingActionButton(
       onPressed: () {
-        Get.forceAppUpdate();
+        //Get.forceAppUpdate();
         controller.onTabTapped(2);
       },
       backgroundColor: const Color(0xffFDB624),

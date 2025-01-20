@@ -6,9 +6,9 @@ class GeneratePage extends GetView<HomePageController> {
   const GeneratePage({super.key});
 
   @override
-  Widget build(BuildContext context) => Container(
-        color: const Color(0xff868686),
-        child: SafeArea(
+  Widget build(BuildContext context) => Center(
+        child: Container(
+          color: const Color(0xff868686),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -19,7 +19,7 @@ class GeneratePage extends GetView<HomePageController> {
                   children: [
                     _buildTextField(),
                     const SizedBox(height: 24),
-                
+
                     _buildGenerateQRCodeButton(),
                     const SizedBox(height: 24),
                     Row(
@@ -45,7 +45,7 @@ class GeneratePage extends GetView<HomePageController> {
                         )
                       ],
                     ),
-                
+
                     const SizedBox(height: 24),
                     // Save and Share Buttons
                     Obx(
@@ -129,7 +129,7 @@ class GeneratePage extends GetView<HomePageController> {
       child: TextField(
         controller: controller.textController,
         onChanged: (value) {
-          Get.forceAppUpdate();
+          //Get.forceAppUpdate();
         },
         decoration: InputDecoration(
           labelText: 'متن خود را برای ساخت کد QR وارد کنید',

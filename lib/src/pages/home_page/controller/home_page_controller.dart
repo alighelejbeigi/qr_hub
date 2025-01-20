@@ -36,12 +36,6 @@ class HomePageController extends GetxController {
   bool isSwitchCamera = false;
   final uuid = const Uuid();
 
-  final pages = [
-    const HistoryPage(),
-    const GeneratePage(),
-    const MainPage(),
-  ];
-
   final titles = [
     const Text('تاریخچه QR'),
     const Text('ساخت کد QR'),
@@ -67,6 +61,7 @@ class HomePageController extends GetxController {
   Future<void> initializeCamera() async {
     try {
       final cameraPermission = await Permission.camera.request();
+      var status = await Permission.storage.request();
 
       if (!cameraPermission.isGranted) {
         _showFaildSnackBar(
@@ -409,7 +404,7 @@ class HomePageController extends GetxController {
                 getAllHistory();
                 generateQRCode();
                 _showSuccesSnackBar('همه QR کد ها پاک شد');
-                Get.forceAppUpdate();
+               // Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),
@@ -444,7 +439,7 @@ class HomePageController extends GetxController {
                 if (!context.mounted) return;
 
                 _showSuccesSnackBar("مورد انتخابی حذف شد");
-                Get.forceAppUpdate();
+                //Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),
@@ -490,7 +485,7 @@ class HomePageController extends GetxController {
         return;
       }
       final customDir = Directory('/storage/emulated/0/Download');
-      String filePath = '${customDir.path}/easyQrCode_${Uuid().v4()}.png';
+      String filePath = '${customDir.path}/easyQrCode_${const Uuid().v4()}.png';
       final file = File(filePath);
       await file.writeAsBytes(imageBytes.value!);
       _showSuccesSnackBar('در دانلود ها ذخیره شد');
