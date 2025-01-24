@@ -129,7 +129,7 @@ class GeneratePage extends GetView<HomePageController> {
       child: TextField(
         controller: controller.textController,
         onChanged: (value) {
-          //Get.forceAppUpdate();
+          Get.forceAppUpdate();
         },
         decoration: InputDecoration(
           labelText: 'متن خود را برای ساخت کد QR وارد کنید',

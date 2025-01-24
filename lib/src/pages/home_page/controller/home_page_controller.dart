@@ -405,7 +405,7 @@ class HomePageController extends GetxController {
                 getAllHistory();
                 generateQRCode();
                 _showSuccesSnackBar('همه QR کد ها پاک شد');
-               // Get.forceAppUpdate();
+               Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),
@@ -440,7 +440,7 @@ class HomePageController extends GetxController {
                 if (!context.mounted) return;
 
                 _showSuccesSnackBar("مورد انتخابی حذف شد");
-                //Get.forceAppUpdate();
+                Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),

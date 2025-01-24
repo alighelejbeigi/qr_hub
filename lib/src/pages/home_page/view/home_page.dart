@@ -65,7 +65,7 @@ class HomePage extends GetView<HomePageController> {
               isSelected: controller.selectedIndex.value == 1,
               onTap: () {
                 controller.onTabTapped(1);
-                //Get.forceAppUpdate();
+                Get.forceAppUpdate();
               },
             ),
             const SizedBox(width: 50),
@@ -76,7 +76,7 @@ class HomePage extends GetView<HomePageController> {
               isSelected: controller.selectedIndex.value == 0,
               onTap: () {
                 controller.onTabTapped(0);
-                //Get.forceAppUpdate();
+                Get.forceAppUpdate();
               },
             ),
           ],
@@ -125,7 +125,7 @@ class HomePage extends GetView<HomePageController> {
   Widget _buildFloatingButton() {
     return FloatingActionButton(
       onPressed: () {
-        //Get.forceAppUpdate();
+        Get.forceAppUpdate();
         controller.onTabTapped(2);
       },
       backgroundColor: const Color(0xffFDB624),
