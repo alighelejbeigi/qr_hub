@@ -10,11 +10,12 @@ class MainPage extends GetView<HomePageController> {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: Obx(() {
+        child: Obx(() {
           final currentController = controller.cameraController.value;
           if (controller.isCameraReady.value &&
               currentController != null &&
-              currentController.value.isInitialized && !controller.isLoading.value) {
+              currentController.value.isInitialized &&
+              !controller.isLoading.value) {
             return Column(
               children: [
                 Expanded(
@@ -36,7 +37,7 @@ class MainPage extends GetView<HomePageController> {
             );
           }
         }),
-  );
+      );
 
   // Action Buttons Method (Gallery, Capture, Switch Camera, Flashlight)
   Widget _buildActionButtons(BuildContext context) {

@@ -14,16 +14,16 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        supportedLocales: const [
+       /* supportedLocales: const [
           Locale('en', 'US'),
           Locale('fa', 'IR')
-        ],
-        builder: (context, child) {
+        ],*/
+        /*builder: (context, child) {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: child!,
           );
-        },
+        },*/
         routerConfig: RoutePages.router,
       );
 }

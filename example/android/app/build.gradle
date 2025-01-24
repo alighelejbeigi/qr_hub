@@ -32,7 +32,7 @@ android {
     namespace 'com.qr_hub.qr_hub'
 
     defaultConfig {
-        minSdkVersion 23
+        minSdkVersion 21
         targetSdkVersion 34
         multiDexEnabled true
         versionCode flutterVersionCode.toInteger()
