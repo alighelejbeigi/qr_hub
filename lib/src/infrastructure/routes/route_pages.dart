@@ -7,6 +7,8 @@ import '../../pages/details_page/commons/details_bindings.dart';
 import '../../pages/details_page/view/details_page.dart';
 import '../../pages/home_page/commons/home_page_bindings.dart';
 import '../../pages/home_page/view/home_page.dart';
+import '../../pages/login_page/commons/login_bindings.dart';
+import '../../pages/login_page/view/login_page.dart';
 import '../../pages/splash_screen/commons/splash_bindings.dart';
 import '../../pages/splash_screen/view/splash_screen.dart';
 import 'route_names.dart';
@@ -39,6 +41,15 @@ class RoutePages {
           SettingBindings().dependencies();
           return const MaterialPage(
             child: SettingPage(),
+          );
+        },
+      ),
+      GoRoute(
+        path: RouteNames.loginPage,
+        pageBuilder: (context, state) {
+          LoginBindings().dependencies();
+          return MaterialPage(
+            child: LoginPage(),
           );
         },
       ),

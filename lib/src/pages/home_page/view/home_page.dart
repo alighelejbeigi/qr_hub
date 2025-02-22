@@ -22,11 +22,11 @@ class HomePage extends GetView<HomePageController> {
   Widget _mainBody() {
 
     if (controller.selectedIndex.value == 2) {
-      return MainPage();
+      return const MainPage();
     } else if (controller.selectedIndex.value == 0) {
-      return HistoryPage();
+      return const HistoryPage();
     } else {
-      return GeneratePage();
+      return const GeneratePage();
     }
   }
 

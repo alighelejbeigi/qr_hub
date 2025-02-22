@@ -19,6 +19,7 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(QrCodeScanHistoryAdapter());
   Hive.registerAdapter(QrCodeGenerateHistoryAdapter());
+  Hive.registerAdapter(UserIdAdapter());
   await SentryFlutter.init(
     (options) {
       options.dsn =

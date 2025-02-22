@@ -10,7 +10,7 @@ class SplashController extends GetxController {
       const Duration(seconds: 2),
       () {
         if (!context.mounted) return;
-        context.go(RouteNames.homePage);
+        context.go(RouteNames.loginPage);
       },
     );
   }

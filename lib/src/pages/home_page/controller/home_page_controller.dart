@@ -14,9 +14,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
-import '../view/widget/generate_page.dart';
-import '../view/widget/history_page.dart';
-import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
   final TextEditingController textController = TextEditingController();
@@ -61,7 +58,7 @@ class HomePageController extends GetxController {
   Future<void> initializeCamera() async {
     try {
       final cameraPermission = await Permission.camera.request();
-      var status = await Permission.storage.request();
+      //var status = await Permission.storage.request();
 
       if (!cameraPermission.isGranted) {
         _showFaildSnackBar(
@@ -116,7 +113,6 @@ class HomePageController extends GetxController {
         camera,
         ResolutionPreset.medium,
         enableAudio: false,
-
       );
 
       cameraController.value = newController;
@@ -405,7 +401,7 @@ class HomePageController extends GetxController {
                 getAllHistory();
                 generateQRCode();
                 _showSuccesSnackBar('همه QR کد ها پاک شد');
-               Get.forceAppUpdate();
+                Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),
