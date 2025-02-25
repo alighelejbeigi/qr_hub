@@ -1,73 +1,88 @@
 import 'package:flutter/material.dart';
-import 'package:appwrite/appwrite.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:qr_hub/src/pages/login_page/controller/login_controller.dart';
-
-import '../../../../qr_hub.dart';
-import '../../../infrastructure/app_writer.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    controller.test(context);
+
+
     return Scaffold(
       appBar: AppBar(
-          title:
-              Obx(() => Text(controller.isLogin.value ? 'ورود' : 'ثبت‌نام'))),
+        title: Obx(() => Text(controller.isLogin.value ? 'ورود' : 'ثبت‌نام')),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Obx(() => !controller.isLogin.value
-                ? TextField(
-                    controller: controller.fullNameController,
-                    decoration: InputDecoration(labelText: 'نام کامل'),
-                  )
-                : SizedBox()),
-            TextField(
-              controller: controller.emailController,
-              decoration: InputDecoration(labelText: 'ایمیل'),
-              keyboardType: TextInputType.emailAddress,
-            ),
-            TextField(
-              controller: controller.passwordController,
-              decoration: InputDecoration(labelText: 'رمز عبور'),
-              obscureText: true,
-            ),
-            Obx(() => controller.isLogin.value
-                ? Row(
-                    children: [
-                      Obx(() => Checkbox(
-                            value: controller.rememberMe.value,
-                            onChanged: (value) =>
-                                controller.rememberMe.value = value!,
-                          )),
-                      const Text('مرا به خاطر بسپار'),
-                    ],
-                  )
-                : SizedBox()),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => controller.isLogin.value
-                  ? controller.login(context)
-                  : controller.signUp(),
-              child: Obx(
-                  () => Text(controller.isLogin.value ? 'ورود' : 'ثبت‌نام')),
-            ),
-            TextButton(
-              onPressed: () =>
-                  controller.isLogin.value = !controller.isLogin.value,
-              child: Obx(() => Text(controller.isLogin.value
-                  ? 'حساب کاربری ندارید؟ ثبت‌نام'
-                  : 'قبلاً ثبت‌نام کرده‌اید؟ ورود')),
-            ),
-          ],
+        child: Form(
+          key: controller.formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Obx(
+                    () => !controller.isLogin.value
+                    ? TextFormField(
+                  controller: controller.fullNameController,
+                  decoration: const InputDecoration(labelText: 'نام کامل'),
+                  validator: (value) =>
+                  value!.isEmpty ? 'وارد کردن نام کامل الزامی است' : null,
+                )
+                    : const SizedBox(),
+              ),
+              TextFormField(
+                controller: controller.emailController,
+                decoration: const InputDecoration(labelText: 'ایمیل'),
+                keyboardType: TextInputType.emailAddress,
+                validator: (value) => value!.isEmpty
+                    ? 'وارد کردن ایمیل الزامی است'
+                    : (!GetUtils.isEmail(value)
+                    ? 'ایمیل معتبر نیست'
+                    : null),
+              ),
+              Obx(
+                    () => TextFormField(
+                  controller: controller.passwordController,
+                  decoration: InputDecoration(
+                    labelText: 'رمز عبور',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        controller.isPasswordVisible.value
+                            ? Icons.visibility
+                            : Icons.visibility_off,
+                      ),
+                      onPressed: () {
+                        controller.isPasswordVisible.value =
+                        !controller.isPasswordVisible.value;
+                      },
+                    ),
+                  ),
+                  obscureText: !controller.isPasswordVisible.value,
+                  validator: (value) =>
+                  value!.isEmpty ? 'وارد کردن رمز عبور الزامی است' : null,
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (controller.formKey.currentState!.validate()) {
+                    controller.isLogin.value
+                        ? controller.login(context)
+                        : controller.signUp(context);
+                  }
+                },
+                child: Obx(() => Text(controller.isLogin.value ? 'ورود' : 'ثبت‌نام')),
+              ),
+              TextButton(
+                onPressed: () => controller.isLogin.value = !controller.isLogin.value,
+                child: Obx(
+                      () => Text(controller.isLogin.value
+                      ? 'حساب کاربری ندارید؟ ثبت‌نام'
+                      : 'قبلاً ثبت‌نام کرده‌اید؟ ورود'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

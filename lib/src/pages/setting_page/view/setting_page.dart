@@ -9,10 +9,13 @@ class SettingPage extends GetView<SettingController> {
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xffFDB624),
-          title: const Text('Setting'),
+          title: const Text('تنظیمات'),
         ),
-        body: const Center(
-          child: Text('setting'),
+        body:  Center(
+          child: InkWell(
+            onTap: ()=> controller.singout(context),
+            child: Text('خروج'),
+          ),
         ),
       );
 }

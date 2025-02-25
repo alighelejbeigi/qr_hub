@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_hub/src/pages/home_page/view/widget/history_page.dart';
 
+import '../../../../qr_hub.dart';
 import '../controller/home_page_controller.dart';
 import 'widget/generate_page.dart';
 import 'widget/main_page.dart';
@@ -36,10 +38,10 @@ class HomePage extends GetView<HomePageController> {
         backgroundColor: const Color(0xffFDB624),
         title: Obx(() => controller.titles[controller.selectedIndex.value]),
         actions: [
-          /*  IconButton(
+            IconButton(
           icon: const Icon(Icons.settings),
           onPressed: () => context.push(RouteNames.settingPage),
-        ),*/
+        ),
           if (controller.selectedIndex.value == 0)
             IconButton(
               icon: const Icon(Icons.delete),
