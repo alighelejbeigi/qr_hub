@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:qr_hub/src/pages/home_page/models/qr_generate_dto.dart';
 import '../../../../../qr_hub.dart';
 import '../../../shared/enum/qr_code_enum.dart';
 import '../../controller/home_page_controller.dart';
+import '../../models/qr_scan_dto.dart';
 
 class HistoryPage extends GetView<HomePageController> {
   const HistoryPage({super.key});
@@ -51,35 +53,37 @@ class HistoryPage extends GetView<HomePageController> {
               child: TabBarView(
                 children: [
                   // Tab 1: Show Scanned QR Codes History
-                  _buildHistoryList<QrCodeScanHistory>(
-                    future: controller.getAllHistory(),
+                  _buildHistoryList<QrScan>(
+                    future: controller.fetchUserScans(),
                     itemBuilder: (context, history) {
                       return _buildHistoryTile(
                           history: history,
                           context: context,
                           onDelete: () async {
                             controller.showDeleteDialog(
-                              context,
-                              history.id,
-                              true,
-                            );
+                                context: context,
+                                id: history.id,
+                                isScanHistory: true,
+                                fileId: history.fileId);
                           });
                     },
                   ),
                   // Tab 2: Show Generated QR Codes History
-                  _buildHistoryList<QrCodeGenerateHistory>(
-                    future: controller.getAllGenerationHistory(),
+                  _buildHistoryList<QrGenerate>(
+                    future: controller.fetchUserGenerate(),
                     itemBuilder: (context, history) {
                       return _buildHistoryGenerationTile(
-                          history: history,
-                          onDelete: () async {
-                            controller.showDeleteDialog(
-                              context,
-                              history.id,
-                              false,
-                            );
-                          },
-                          context: context);
+                        history: history,
+                        onDelete: () async {
+                          controller.showDeleteDialog(
+                            context: context,
+                            id: history.id,
+                            isScanHistory: false,
+                            fileId: history.fileId,
+                          );
+                        },
+                        context: context,
+                      );
                     },
                   ),
                 ],
@@ -122,7 +126,7 @@ class HistoryPage extends GetView<HomePageController> {
 
   // Helper method to build a ListTile for each history entry
   Widget _buildHistoryTile({
-    required final QrCodeScanHistory history,
+    required final QrScan history,
     required VoidCallback onDelete,
     required BuildContext context,
   }) {
@@ -140,7 +144,7 @@ class HistoryPage extends GetView<HomePageController> {
           borderRadius: BorderRadius.circular(12),
         ),
         child: ListTile(
-          contentPadding: const EdgeInsets.all(12),
+          contentPadding: const EdgeInsets.all(4),
           title: Text(
             history.text,
             style: const TextStyle(color: Colors.white),
@@ -149,11 +153,17 @@ class HistoryPage extends GetView<HomePageController> {
             formattedDate,
             style: const TextStyle(color: Colors.grey),
           ),
-          leading: history.photo != null
+          leading: history.photoUrl != null
               ? ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.memory(history.photo!,
-                      width: 50, height: 50, fit: BoxFit.cover),
+                  child: SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: Image.network(
+                      history.photoUrl != null ? history.photoUrl! : '',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 )
               : const Icon(
                   Icons.image,
@@ -169,7 +179,7 @@ class HistoryPage extends GetView<HomePageController> {
   }
 
   Widget _buildHistoryGenerationTile({
-    required final QrCodeGenerateHistory history,
+    required final QrGenerate history,
     required VoidCallback onDelete,
     required BuildContext context,
   }) {
@@ -196,16 +206,11 @@ class HistoryPage extends GetView<HomePageController> {
             formattedDate,
             style: const TextStyle(color: Colors.grey),
           ),
-          leading: history.photo != null
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: Image.memory(history.photo!,
-                      width: 50, height: 50, fit: BoxFit.cover),
-                )
-              : const Icon(
-                  Icons.image,
-                  color: Colors.white,
-                ),
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(history.qrImageUrl,
+                width: 50, height: 50, fit: BoxFit.cover),
+          ),
           trailing: IconButton(
             icon: const Icon(Icons.delete, color: Colors.red),
             onPressed: onDelete,

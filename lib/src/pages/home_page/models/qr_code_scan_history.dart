@@ -17,7 +17,7 @@ class QrCodeScanHistory extends HiveObject {
   final String id;
 
   @HiveField(3)
-  final Uint8List? photo; // اضافه کردن فیلد تصویر
+  final Uint8List? photo;
 
   QrCodeScanHistory({
     required this.text,

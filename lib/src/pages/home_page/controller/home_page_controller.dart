@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:appwrite/appwrite.dart' as appwrite;
 import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
 import 'package:flutter/material.dart';
@@ -9,11 +10,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:permission_handler/permission_handler.dart' as handler;
+import 'package:qr_hub/src/infrastructure/app_writer.dart';
+import 'package:qr_hub/src/pages/home_page/models/qr_generate_dto.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
+import '../models/qr_scan_dto.dart';
 
 class HomePageController extends GetxController {
   final TextEditingController textController = TextEditingController();
@@ -23,6 +27,8 @@ class HomePageController extends GetxController {
   RxInt selectedIndex = 2.obs;
   RxBool isFlashOn = false.obs;
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
+  XFile? xFile;
+
   late List<CameraDescription> cameras;
 
   //RxString qrCodeResult = ''.obs;
@@ -57,7 +63,7 @@ class HomePageController extends GetxController {
 
   Future<void> initializeCamera() async {
     try {
-      final cameraPermission = await Permission.camera.request();
+      final cameraPermission = await handler.Permission.camera.request();
       //var status = await Permission.storage.request();
 
       if (!cameraPermission.isGranted) {
@@ -135,6 +141,115 @@ class HomePageController extends GetxController {
     }
   }
 
+  final String databaseId = '66cadb580006a39e25e7';
+
+  final String collectionScanId = '67be17330001d602b00f';
+  final String collectionGenerateId = '67be1e410031415ab6c6';
+
+  // QrCodeService({required this.databases});
+
+  Future<void> saveQrScan(QrScan qrData) async {
+    await appwriteService.databases.createDocument(
+      databaseId: databaseId,
+      collectionId: collectionScanId,
+      documentId: appwrite.ID.unique(),
+      data: qrData.toJson(),
+    );
+  }
+
+  Future<void> saveQrGenerate(QrGenerate qrData) async {
+    await appwriteService.databases.createDocument(
+      databaseId: databaseId,
+      collectionId: collectionGenerateId,
+      documentId: appwrite.ID.unique(),
+      data: qrData.toJson(),
+    );
+  }
+
+  Future<String?> uploadQrImage(Uint8List bytes) async {
+    try {
+      // دریافت اطلاعات کاربر فعلی
+      final user = await appwriteService.account.get();
+
+      final response = await appwriteService.storage.createFile(
+        bucketId: '67c1719c000278a3d248',
+        fileId: appwrite.ID.unique(),
+        file: appwrite.InputFile.fromBytes(
+          bytes: bytes,
+          filename: 'qr_code_${DateTime.now().millisecondsSinceEpoch}.png',
+        ),
+        permissions: [
+          appwrite.Permission.read('user:${user.$id}'),
+          appwrite.Permission.delete('user:${user.$id}'),
+          appwrite.Permission.update('user:${user.$id}'),
+        ],
+      );
+
+      return response.$id;
+    } catch (e) {
+      print("Error uploading file: $e");
+      return null;
+    }
+  }
+
+  String getQrImageUrl(String fileId) {
+    return "https://cloud.appwrite.io/v1/storage/buckets/67c1719c000278a3d248/files/$fileId/view?project=66cad12e001f798dacf8";
+  }
+
+  Future<List<QrScan>> fetchUserScans() async {
+    final session =
+        await appwriteService.account.getSession(sessionId: 'current');
+    final response = await appwriteService.databases.listDocuments(
+      databaseId: databaseId,
+      collectionId: collectionScanId,
+      queries: [appwrite.Query.equal('userId', session.userId)],
+    );
+
+    return response.documents.map((doc) => QrScan.fromJson(doc.data)).toList();
+  }
+
+  Future<List<QrGenerate>> fetchUserGenerate() async {
+    final session =
+        await appwriteService.account.getSession(sessionId: 'current');
+    final response = await appwriteService.databases.listDocuments(
+      databaseId: databaseId,
+      collectionId: collectionGenerateId,
+      queries: [appwrite.Query.equal('userId', session.userId)],
+    );
+
+    return response.documents
+        .map((doc) => QrGenerate.fromJson(doc.data))
+        .toList();
+  }
+
+  Future<void> deleteQrScan(String documentId, String? fileId) async {
+    await appwriteService.databases.deleteDocument(
+      databaseId: databaseId,
+      collectionId: collectionScanId,
+      documentId: documentId,
+    );
+    if (fileId != null) {
+      await appwriteService.storage.deleteFile(
+        bucketId: '67c1719c000278a3d248',
+        fileId: fileId,
+      );
+    }
+  }
+
+  Future<void> deleteQrGenerate(String documentId, String? fileId) async {
+    await appwriteService.databases.deleteDocument(
+      databaseId: databaseId,
+      collectionId: collectionGenerateId,
+      documentId: documentId,
+    );
+    if (fileId != null) {
+      await appwriteService.storage.deleteFile(
+        bucketId: '67c1719c000278a3d248',
+        fileId: fileId,
+      );
+    }
+  }
+
   Future<void> saveHistoryRead(String result) async {
     final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
 
@@ -189,8 +304,30 @@ class HomePageController extends GetxController {
     return box.values.toList();
   }
 
-  void showResultDialog(BuildContext context, String result) {
-    saveHistoryRead(result);
+  Future<void> showResultDialog(BuildContext context, String result) async {
+    //saveHistoryRead(result);
+    final session =
+        await appwriteService.account.getSession(sessionId: 'current');
+    String? imageUrl;
+    String? fileId;
+    if (imageBytesForSave != null) {
+      fileId = await uploadQrImage(imageBytesForSave!);
+      if (fileId != null) {
+        imageUrl = getQrImageUrl(fileId);
+      }
+    }
+
+    saveQrScan(
+      QrScan(
+        id: '',
+        text: result,
+        date: DateTime.now(),
+        userId: session.userId,
+        photoUrl: imageUrl,
+        fileId: fileId,
+      ),
+    );
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -285,6 +422,7 @@ class HomePageController extends GetxController {
     }
     try {
       final XFile picture = await cameraController.value!.takePicture();
+
       final bytes = await picture.readAsBytes();
       imageBytesForSave = bytes;
       final qrReader = EasyQRCodeReader();
@@ -361,11 +499,33 @@ class HomePageController extends GetxController {
   Future<void> generateQRCode() async {
     final data = textController.text;
     if (data.isNotEmpty) {
+      final session =
+          await appwriteService.account.getSession(sessionId: 'current');
+
       final qrWidget = await qrGenerator.generateQRCodeImage(data: data);
       final bytes = await convertImageToBytes(qrWidget);
       if (bytes != null) {
         imageBytes.value = bytes;
-        saveHistoryGeneration(data);
+        imageBytesForSave = bytes;
+        String? imageUrl;
+        String? fileId;
+        if (imageBytesForSave != null) {
+          fileId = await uploadQrImage(imageBytesForSave!);
+          if (fileId != null) {
+            imageUrl = getQrImageUrl(fileId);
+          }
+        }
+        saveQrGenerate(
+          QrGenerate(
+            id: '',
+            fileId: fileId!,
+            qrImageUrl: imageUrl!,
+            userId: session.userId,
+            date: DateTime.now(),
+            text: data,
+          ),
+        );
+        imageBytesForSave = null;
       } else {
         return;
       }
@@ -412,7 +572,12 @@ class HomePageController extends GetxController {
     );
   }
 
-  void showDeleteDialog(BuildContext context, String id, bool isScanHistory) {
+  void showDeleteDialog({
+    required BuildContext context,
+    required String id,
+    String? fileId,
+    required bool isScanHistory,
+  }) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -429,9 +594,9 @@ class HomePageController extends GetxController {
             TextButton(
               onPressed: () async {
                 if (isScanHistory) {
-                  await deleteHistory(id);
+                  await deleteQrScan(id, fileId);
                 } else {
-                  await deleteHistoryGeneration(id);
+                  await deleteQrGenerate(id, fileId);
                 }
                 if (!context.mounted) return;
 
@@ -476,7 +641,7 @@ class HomePageController extends GetxController {
 
   Future<void> saveQRCodeToDownloads() async {
     try {
-      var status = await Permission.storage.request();
+      var status = await handler.Permission.storage.request();
       if (!status.isGranted) {
         _showFaildSnackBar('مجوز ذخیره سازی رد شد');
         return;
