@@ -60,8 +60,8 @@ class DetailsPage extends GetView<DetailsController> {
   /// Builds the data section widget
   Widget _buildDataSection() {
     final qrCodeData = _qrCodeScan()
-        ? controller.itemScan?.text ?? 'اطلاعاتی وجود ندارد'
-        : controller.itemGenerait?.text ?? 'اطلاعاتی وجود ندارد';
+        ? controller.qrScan?.text ?? 'اطلاعاتی وجود ندارد'
+        : controller.qrGenerate?.text ?? 'اطلاعاتی وجود ندارد';
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -109,13 +109,13 @@ class DetailsPage extends GetView<DetailsController> {
   /// Builds the QR code image section widget
   Widget _buildQRCodeImageSection() {
     final imageData = _qrCodeScan()
-        ? controller.itemScan!.photo!
-        : controller.itemGenerait!.photo!;
+        ? controller.qrScan!.photoUrl!
+        : controller.qrGenerate!.qrImageUrl;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: _containerDecoration(),
-      child: Image.memory(
+      child: Image.network(
         imageData,
         height: 200,
         width: 200,
