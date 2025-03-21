@@ -43,7 +43,7 @@ class HistoryPage extends GetView<HomePageController> {
               child: TabBarView(
                 children: [
                   _buildHistoryList<QrCodeScanHistory>(
-                    future: controller.getAllHistory(),
+                    future: controller.historyQrHelper.getAllHistory(),
                     itemBuilder: (context, history) {
                       return _buildHistoryTile(
                           history: history,
@@ -58,7 +58,8 @@ class HistoryPage extends GetView<HomePageController> {
                     },
                   ),
                   _buildHistoryList<QrCodeGenerateHistory>(
-                    future: controller.getAllGenerationHistory(),
+                    future:
+                        controller.historyQrHelper.getAllGenerationHistory(),
                     itemBuilder: (context, history) {
                       return _buildHistoryGenerationTile(
                           history: history,
@@ -132,7 +133,7 @@ class HistoryPage extends GetView<HomePageController> {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            controller.convertToJalali(history.date),
+            controller.historyQrHelper.convertToJalali(history.date),
             style: const TextStyle(color: Colors.grey),
           ),
           leading: history.photo != null
@@ -177,7 +178,7 @@ class HistoryPage extends GetView<HomePageController> {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            controller.convertToJalali(history.date),
+            controller.historyQrHelper.convertToJalali(history.date),
             style: const TextStyle(color: Colors.grey),
           ),
           leading: history.photo != null

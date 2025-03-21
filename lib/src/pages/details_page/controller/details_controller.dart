@@ -21,7 +21,7 @@ class DetailsController extends GetxController {
   String id;
   String type;
   QrCodeScanHistory? itemScan;
-  QrCodeGenerateHistory? itemGenerait;
+  QrCodeGenerateHistory? itemGenerate;
   RxBool isLoading = false.obs;
   final qrGenerator = EasyQRCodeGenerator();
 
@@ -46,7 +46,7 @@ class DetailsController extends GetxController {
     isLoading.value = true;
     final box =
         await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
-    itemGenerait = box.get(id);
+    itemGenerate = box.get(id);
     isLoading.value = false;
   }
 
@@ -61,7 +61,7 @@ class DetailsController extends GetxController {
       String filePath = '${customDir.path}/easyQrCode_${const Uuid().v4()}.png';
       final file = File(filePath);
       if (type == '1') {
-        await file.writeAsBytes(itemGenerait!.photo!);
+        await file.writeAsBytes(itemGenerate!.photo!);
       } else {
         await file.writeAsBytes(itemScan!.photo!);
       }
@@ -73,7 +73,7 @@ class DetailsController extends GetxController {
 
   void copyToClipboard() {
     if (type == '1') {
-      Clipboard.setData(ClipboardData(text: itemGenerait!.text));
+      Clipboard.setData(ClipboardData(text: itemGenerate!.text));
     } else {
       Clipboard.setData(ClipboardData(text: itemScan!.text));
     }
@@ -117,10 +117,9 @@ class DetailsController extends GetxController {
     }
   }
 
-  // Method to share generated QR code image
   Future<void> shareQRCodeImage() async {
     if (type == '1') {
-      qrGenerator.shareQRCodeFromBytes(qrBytes: itemGenerait!.photo!);
+      qrGenerator.shareQRCodeFromBytes(qrBytes: itemGenerate!.photo!);
     } else {
       qrGenerator.shareQRCodeFromBytes(qrBytes: itemScan!.photo!);
     }

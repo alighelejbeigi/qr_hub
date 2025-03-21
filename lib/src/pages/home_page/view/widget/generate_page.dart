@@ -24,13 +24,15 @@ class GeneratePage extends GetView<HomePageController> {
                     Row(
                       children: [
                         Obx(
-                          () => controller.imageBytes.value != null
+                          () => controller.generateQRHelper.imageBytes.value !=
+                                  null
                               ? Expanded(
                                   child: Container(
                                     padding: const EdgeInsets.all(16.0),
                                     decoration: _containerDecoration(),
                                     child: Image.memory(
-                                      controller.imageBytes.value!,
+                                      controller
+                                          .generateQRHelper.imageBytes.value!,
                                       height: 200,
                                       width: 200,
                                       fit: BoxFit.contain,
@@ -46,7 +48,7 @@ class GeneratePage extends GetView<HomePageController> {
                     ),
                     const SizedBox(height: 24),
                     Obx(
-                      () => controller.imageBytes.value != null
+                      () => controller.generateQRHelper.imageBytes.value != null
                           ? _buildSaveAndShareButtons()
                           : const SizedBox.shrink(),
                     ),
@@ -79,13 +81,13 @@ class GeneratePage extends GetView<HomePageController> {
         _buildButton(
           label: 'ذخیره',
           icon: Icons.save_alt,
-          onPressed: controller.saveQRCodeToDownloads,
+          onPressed: controller.generateQRHelper.saveQRCodeToDownloads,
         ),
         const SizedBox(width: 10),
         _buildButton(
           label: 'اشتراک ‌گذاری',
           icon: Icons.share,
-          onPressed: controller.shareQRCodeImage,
+          onPressed: controller.generateQRHelper.shareQRCodeImage,
         ),
       ],
     );
@@ -124,7 +126,7 @@ class GeneratePage extends GetView<HomePageController> {
         ],
       ),
       child: TextField(
-        controller: controller.textController,
+        controller: controller.generateQRHelper.textController,
         onChanged: (value) {
           Get.forceAppUpdate();
         },
@@ -160,8 +162,8 @@ class GeneratePage extends GetView<HomePageController> {
 
   Widget _buildGenerateQRCodeButton() {
     return ElevatedButton(
-      onPressed: controller.textController.text.isNotEmpty
-          ? () => controller.generateQRCode()
+      onPressed: controller.generateQRHelper.textController.text.isNotEmpty
+          ? () => controller.generateQRHelper.generateQRCode()
           : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xffFDB624),

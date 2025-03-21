@@ -26,13 +26,11 @@ class DetailsPage extends GetView<DetailsController> {
         ),
       );
 
-  /// Handles the pop event
   Future<bool> _handleOnPop(bool didPop, dynamic result) async {
     Get.delete<DetailsController>();
     return true;
   }
 
-  /// Builds the AppBar widget
   AppBar _buildAppBar() {
     return AppBar(
       backgroundColor: const Color(0xffFDB624),
@@ -40,10 +38,8 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Determines if the scanned QR code should be used
   bool _qrCodeScan() => controller.type == '2';
 
-  /// Builds the content of the page
   Widget _buildContent() {
     return SingleChildScrollView(
       controller: ScrollController(),
@@ -61,11 +57,10 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Builds the data section widget
   Widget _buildDataSection() {
     final qrCodeData = _qrCodeScan()
         ? controller.itemScan?.text ?? 'اطلاعاتی وجود ندارد'
-        : controller.itemGenerait?.text ?? 'اطلاعاتی وجود ندارد';
+        : controller.itemGenerate?.text ?? 'اطلاعاتی وجود ندارد';
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -106,11 +101,10 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Builds the QR code image section widget
   Widget _buildQRCodeImageSection() {
     final imageData = _qrCodeScan()
         ? controller.itemScan!.photo!
-        : controller.itemGenerait!.photo!;
+        : controller.itemGenerate!.photo!;
 
     return Container(
       padding: const EdgeInsets.all(16.0),
@@ -126,7 +120,6 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Builds the buttons section widget
   Widget _buildButtonsSection() {
     return SingleChildScrollView(
       controller: ScrollController(),
@@ -156,7 +149,6 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Builds a single button with icon and label
   Widget _buildButton({
     required String label,
     required IconData icon,
@@ -176,7 +168,6 @@ class DetailsPage extends GetView<DetailsController> {
     );
   }
 
-  /// Returns the common container decoration
   BoxDecoration _containerDecoration() {
     return BoxDecoration(
       color: Colors.white,

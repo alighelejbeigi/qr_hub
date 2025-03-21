@@ -1,32 +1,27 @@
-import 'dart:io';
-import 'dart:typed_data';
-import 'dart:ui' as ui;
-
 import 'package:camera/camera.dart';
 import 'package:easy_qr_code/easy_qr_code.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
-import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:shamsi_date/shamsi_date.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../../qr_hub.dart';
+import '../view/widget/dialogs/delete_all_dialog.dart';
+import '../view/widget/dialogs/delete_dialog.dart';
+import '../view/widget/dialogs/result_dialog.dart';
+import 'generate_qr_helper.dart';
+import 'history_qr_helper.dart';
 
 class HomePageController extends GetxController {
-  final TextEditingController textController = TextEditingController();
-  final qrGenerator = EasyQRCodeGenerator();
-  Rxn<Uint8List> imageBytes = Rxn();
-  Uint8List? imageBytesForSave;
+  late final GenerateQRHelper generateQRHelper = GenerateQRHelper(this);
+  late final HistoryQrHelper historyQrHelper = HistoryQrHelper(this);
+
   RxInt selectedIndex = 2.obs;
-  RxBool isFlashOn = false.obs;
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   late List<CameraDescription> cameras;
-
-  RxBool isFocused = false.obs;
+  RxBool isFlashOn = false.obs;
   RxBool isCameraReady = false.obs;
   RxBool isFlashSupported = false.obs;
   RxBool isLoading = false.obs;
@@ -56,19 +51,11 @@ class HomePageController extends GetxController {
     selectedIndex.value = index;
   }
 
-  String convertToJalali(DateTime date) {
-    final jalali = Jalali.fromDateTime(date);
-    return '${jalali.year}/${jalali.month}/${jalali.day} - ${date.hour}:${date.minute}';
-  }
-
   Future<void> initializeCamera() async {
     try {
       final cameraPermission = await Permission.camera.request();
-
       if (!cameraPermission.isGranted) {
-        _showFaildSnackBar(
-            'دسترسی به دوربین لازم است تا این عملیات انجام شود.');
-
+        showFaildSnackBar('دسترسی به دوربین لازم است تا این عملیات انجام شود.');
         return;
       }
 
@@ -76,7 +63,7 @@ class HomePageController extends GetxController {
       if (cameras.isNotEmpty) {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
-        _showFaildSnackBar('دوربینی در دسترس نیست.');
+        showFaildSnackBar('دوربینی در دسترس نیست.');
       }
     } catch (e) {
       handleError(e);
@@ -86,7 +73,7 @@ class HomePageController extends GetxController {
   Future<void> toggleFlash() async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      _showFaildSnackBar('دوربین آماده نیست.');
+      showFaildSnackBar('دوربین آماده نیست.');
 
       return;
     }
@@ -100,10 +87,10 @@ class HomePageController extends GetxController {
           isFlashOn.value ? FlashMode.torch : FlashMode.off,
         );
       } else {
-        _showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+        showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
       }
     } catch (e) {
-      _showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+      showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
     }
   }
 
@@ -140,114 +127,17 @@ class HomePageController extends GetxController {
     }
   }
 
-  Future<void> saveHistoryRead(String result) async {
-    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
-
-    // ایجاد آیتم جدید با ID یکتا
-    final newHistory = QrCodeScanHistory(
-      text: result,
-      date: DateTime.now(),
-      id: uuid.v4(), // تولید ID یکتا
-      photo: imageBytesForSave,
-    );
-
-    // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
-    await box.put(newHistory.id, newHistory);
-  }
-
-  Future<void> deleteHistory(String id) async {
-    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
-    await box.delete(id);
-  }
-
-  Future<void> deleteHistoryGeneration(String id) async {
-    final box2 =
-        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
-    await box2.delete(id);
-  }
-
-  Future<void> saveHistoryGeneration(String result) async {
-    final box =
-        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
-
-    // ایجاد آیتم جدید با ID یکتا
-    final newHistory = QrCodeGenerateHistory(
-      text: result,
-      date: DateTime.now(),
-      id: uuid.v4(), // تولید ID یکتا
-      photo: imageBytes.value,
-    );
-
-    // ذخیره آیتم جدید با استفاده از ID به‌عنوان کلید
-    await box.put(newHistory.id, newHistory);
-  }
-
-  Future<List<QrCodeScanHistory>> getAllHistory() async {
-    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
-    return box.values.toList();
-  }
-
-  Future<List<QrCodeGenerateHistory>> getAllGenerationHistory() async {
-    final box =
-        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
-
-    return box.values.toList();
-  }
-
   void showResultDialog(BuildContext context, String result) {
-    saveHistoryRead(result);
+    historyQrHelper.saveHistoryRead(result);
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          backgroundColor: const Color(0xffFDB624),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.qr_code_2,
-                size: 50,
-                color: Colors.white,
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'نتیجه اسکن',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.white,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              clickableResultText(result),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  'باشه',
-                  style: TextStyle(
-                    color: Color(0xffFDB624),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (BuildContext context) => ResultDialog(
+        result: result,
+      ),
     );
   }
 
-  Future<void> _launchURL(String url) async {
+  Future<void> launchURL(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
       throw Exception(' امکان باز کردن این$url وجود ندارد ');
@@ -262,36 +152,17 @@ class HomePageController extends GetxController {
     return regex.hasMatch(url);
   }
 
-  Widget clickableResultText(String result) {
-    bool isValidUrls = isValidUrl(result);
-    return GestureDetector(
-      onTap: () {
-        if (isValidUrls) {
-          _launchURL(result);
-        }
-      },
-      child: Text(
-        result,
-        style: TextStyle(
-          color: isValidUrls ? Colors.blue : Colors.white,
-          decoration:
-              isValidUrls ? TextDecoration.underline : TextDecoration.none,
-        ),
-      ),
-    );
-  }
-
   Future<void> captureAndDecodeQRCode(BuildContext context) async {
     isLoading.value = true;
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      _showFaildSnackBar('دوربین آماده نیست.');
+      showFaildSnackBar('دوربین آماده نیست.');
       return;
     }
     try {
       final XFile picture = await cameraController.value!.takePicture();
       final bytes = await picture.readAsBytes();
-      imageBytesForSave = bytes;
+      historyQrHelper.imageBytesForSave = bytes;
       final qrReader = EasyQRCodeReader();
       final decodedResult = await qrReader.decode(bytes);
       if (decodedResult != null) {
@@ -299,11 +170,11 @@ class HomePageController extends GetxController {
         showResultDialog(context, decodedResult);
         isLoading.value = false;
       } else {
-        _showFaildSnackBar(' کد QR یافت نشد');
+        showFaildSnackBar(' کد QR یافت نشد');
         isLoading.value = false;
       }
     } catch (e) {
-      _showFaildSnackBar('خطا در اسکن کد QR: $e');
+      showFaildSnackBar('خطا در اسکن کد QR: $e');
       isLoading.value = false;
     }
   }
@@ -315,7 +186,7 @@ class HomePageController extends GetxController {
           await ImagePicker().pickImage(source: ImageSource.gallery);
       if (pickedImage != null) {
         final bytes = await pickedImage.readAsBytes();
-        imageBytesForSave = bytes;
+        historyQrHelper.imageBytesForSave = bytes;
         final qrReader = EasyQRCodeReader();
         final decodedResult = await qrReader.decode(bytes);
         if (decodedResult != null) {
@@ -323,15 +194,15 @@ class HomePageController extends GetxController {
           showResultDialog(context, decodedResult);
           isLoading.value = false;
         } else {
-          _showFaildSnackBar('کد QR یافت نشد');
+          showFaildSnackBar('کد QR یافت نشد');
           isLoading.value = false;
         }
       } else {
-        _showFaildSnackBar('تصویری انتخاب نشد.');
+        showFaildSnackBar('تصویری انتخاب نشد.');
         isLoading.value = false;
       }
     } catch (e) {
-      _showFaildSnackBar('خطا در انتخاب تصویر: $e');
+      showFaildSnackBar('خطا در انتخاب تصویر: $e');
       isLoading.value = false;
     }
   }
@@ -345,7 +216,7 @@ class HomePageController extends GetxController {
       isSwitchCamera = true;
       isCameraReady.value = false;
 
-      _showFaildSnackBar('در حال تغییر دوربین...');
+      showFaildSnackBar('در حال تغییر دوربین...');
       try {
         selectedCameraIndex.value =
             (selectedCameraIndex.value + 1) % cameras.length;
@@ -354,105 +225,33 @@ class HomePageController extends GetxController {
         handleError(e);
       } finally {
         isCameraReady.value = true;
-        _showFaildSnackBar('');
+        showFaildSnackBar('');
 
         isSwitchCamera = false;
       }
     } else {
-      _showFaildSnackBar('فقط یک دوربین در دسترس است.');
+      showFaildSnackBar('فقط یک دوربین در دسترس است.');
     }
-  }
-
-  Future<void> generateQRCode() async {
-    final data = textController.text;
-    if (data.isNotEmpty) {
-      final qrWidget = await qrGenerator.generateQRCodeImage(data: data);
-      final bytes = await convertImageToBytes(qrWidget);
-      if (bytes != null) {
-        imageBytes.value = bytes;
-        saveHistoryGeneration(data);
-      } else {
-        return;
-      }
-    }
-  }
-
-  Future<void> deleteAllHistory() async {
-    final box = await Hive.openBox<QrCodeScanHistory>('historyBox');
-    await box.clear();
-    final box2 =
-        await Hive.openBox<QrCodeGenerateHistory>('qrCodeGenerationHistoryBox');
-    await box2.clear();
   }
 
   void showDeleteAllDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('حذف همه QR ها'),
-          content: const Text('آیا مطمئن هستید که می خواهید حذف کنید؟'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('لغو'),
-            ),
-            TextButton(
-              onPressed: () async {
-                await deleteAllHistory();
-                if (!context.mounted) return;
-                getAllHistory();
-                generateQRCode();
-                _showSuccesSnackBar('همه QR کد ها پاک شد');
-                Get.forceAppUpdate();
-                Navigator.of(context).pop();
-              },
-              child: const Text('حذف'),
-            ),
-          ],
-        );
-      },
+      builder: (BuildContext context) => const DeleteAllDialog(),
     );
   }
 
   void showDeleteDialog(BuildContext context, String id, bool isScanHistory) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('حذف یک مورد'),
-          content: const Text('آیا مطمئن هستید که می خواهید حذف کنید؟'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('لغو'),
-            ),
-            TextButton(
-              onPressed: () async {
-                if (isScanHistory) {
-                  await deleteHistory(id);
-                } else {
-                  await deleteHistoryGeneration(id);
-                }
-                if (!context.mounted) return;
-
-                _showSuccesSnackBar("مورد انتخابی حذف شد");
-                Get.forceAppUpdate();
-                Navigator.of(context).pop();
-              },
-              child: const Text('حذف'),
-            ),
-          ],
-        );
-      },
+      builder: (BuildContext context) => DeleteDialog(
+        id: id,
+        isScanHistory: isScanHistory,
+      ),
     );
   }
 
-  void _showFaildSnackBar(String message) {
+  void showFaildSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
@@ -463,7 +262,7 @@ class HomePageController extends GetxController {
         fontSize: 16.0);
   }
 
-  void _showSuccesSnackBar(String message) {
+  void showSuccesSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
@@ -474,34 +273,7 @@ class HomePageController extends GetxController {
         fontSize: 16.0);
   }
 
-  Future<Uint8List?> convertImageToBytes(ui.Image image) async {
-    final byteData = await image.toByteData(format: ui.ImageByteFormat.png);
-    return byteData?.buffer.asUint8List();
-  }
-
-  Future<void> saveQRCodeToDownloads() async {
-    try {
-      var status = await Permission.storage.request();
-      if (!status.isGranted) {
-        _showFaildSnackBar('مجوز ذخیره سازی رد شد');
-        return;
-      }
-      final customDir = Directory('/storage/emulated/0/Download');
-      String filePath = '${customDir.path}/easyQrCode_${const Uuid().v4()}.png';
-      final file = File(filePath);
-      await file.writeAsBytes(imageBytes.value!);
-      _showSuccesSnackBar('در دانلود ها ذخیره شد');
-    } catch (e) {
-      _showFaildSnackBar('خطا در ذخیره فایل');
-    }
-  }
-
-  // Method to share generated QR code image
-  Future<void> shareQRCodeImage() async {
-    qrGenerator.shareQRCodeFromBytes(qrBytes: imageBytes.value!);
-  }
-
   void handleError(dynamic e) {
-    _showFaildSnackBar('خطایی رخ داده است: $e');
+    showFaildSnackBar('خطایی رخ داده است: $e');
   }
 }
