@@ -1,0 +1,2 @@
+/Users/alighelejbeigi/StudioProjects/qr_hub/example/android/app/.cxx/Debug/3j6n4c6y/x86_64/CMakeFiles/edit_cache.dir
+/Users/alighelejbeigi/StudioProjects/qr_hub/example/android/app/.cxx/Debug/3j6n4c6y/x86_64/CMakeFiles/rebuild_cache.dir

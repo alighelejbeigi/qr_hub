@@ -1,0 +1,2 @@
+/Users/alighelejbeigi/StudioProjects/qr_hub/example/android/app/.cxx/RelWithDebInfo/496q1w6q/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/alighelejbeigi/StudioProjects/qr_hub/example/android/app/.cxx/RelWithDebInfo/496q1w6q/armeabi-v7a/CMakeFiles/rebuild_cache.dir

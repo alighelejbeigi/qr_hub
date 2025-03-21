@@ -1,0 +1,1 @@
+/Users/alighelejbeigi/StudioProjects/qr_hub/example/build/app/intermediates/cxx/Debug/3j6n4c6y/obj/arm64-v8a
