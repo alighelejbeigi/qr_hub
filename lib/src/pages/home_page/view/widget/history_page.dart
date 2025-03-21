@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+
 import '../../../../../qr_hub.dart';
 import '../../../shared/enum/qr_code_enum.dart';
 import '../../controller/home_page_controller.dart';
@@ -13,32 +13,25 @@ class HistoryPage extends GetView<HomePageController> {
   Widget build(BuildContext context) {
     return Center(
       child: DefaultTabController(
-        length: 2, // Number of tabs
+        length: 2,
         child: Column(
           children: [
             const SizedBox(height: 16),
-            // TabBar with a custom background, rounded borders, dark text
             Container(
               decoration: BoxDecoration(
                 color: const Color(0xff333333),
-                // Background color for the TabBar
-                borderRadius: BorderRadius.circular(12), // Rounded corners
+                borderRadius: BorderRadius.circular(12),
               ),
               margin: const EdgeInsets.symmetric(horizontal: 16),
-              // Spacing on the sides
               child: const Padding(
                 padding: EdgeInsets.only(top: 8.0, bottom: 8.0),
-                // Padding around the TabBar
                 child: TabBar(
                   labelStyle:
                       TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   labelColor: Color(0xffFDB624),
-                  // Color for selected tab text
                   unselectedLabelColor: Colors.white,
-                  // Color for unselected tab text
                   indicator: BoxDecoration(),
                   dividerHeight: 0,
-                  // Disable the bottom indicator or selection highlight
                   tabs: [
                     Tab(text: 'کد های اسکن شده'), // Tab 1
                     Tab(text: 'کد های ساخته شده'), // Tab 2
@@ -46,11 +39,9 @@ class HistoryPage extends GetView<HomePageController> {
                 ),
               ),
             ),
-            // TabBarView with content
             Expanded(
               child: TabBarView(
                 children: [
-                  // Tab 1: Show Scanned QR Codes History
                   _buildHistoryList<QrCodeScanHistory>(
                     future: controller.getAllHistory(),
                     itemBuilder: (context, history) {
@@ -66,7 +57,6 @@ class HistoryPage extends GetView<HomePageController> {
                           });
                     },
                   ),
-                  // Tab 2: Show Generated QR Codes History
                   _buildHistoryList<QrCodeGenerateHistory>(
                     future: controller.getAllGenerationHistory(),
                     itemBuilder: (context, history) {
@@ -91,7 +81,6 @@ class HistoryPage extends GetView<HomePageController> {
     );
   }
 
-  // Generic builder for history lists (for both generated and scanned QR codes)
   Widget _buildHistoryList<T>({
     required Future<List<T>> future,
     required Widget Function(BuildContext context, T history) itemBuilder,
@@ -120,22 +109,17 @@ class HistoryPage extends GetView<HomePageController> {
     );
   }
 
-  // Helper method to build a ListTile for each history entry
   Widget _buildHistoryTile({
     required final QrCodeScanHistory history,
     required VoidCallback onDelete,
     required BuildContext context,
   }) {
-    final formattedDate =
-        DateFormat('yyyy/MM/dd – HH:mm:ss').format(history.date);
-
     return GestureDetector(
       onTap: () => context.push(
           '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.scanQRCode.id}'),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         color: const Color(0xff444444),
-        // Slightly lighter background for list tile
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -144,9 +128,11 @@ class HistoryPage extends GetView<HomePageController> {
           title: Text(
             history.text,
             style: const TextStyle(color: Colors.white),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            formattedDate,
+            controller.convertToJalali(history.date),
             style: const TextStyle(color: Colors.grey),
           ),
           leading: history.photo != null
@@ -173,16 +159,12 @@ class HistoryPage extends GetView<HomePageController> {
     required VoidCallback onDelete,
     required BuildContext context,
   }) {
-    final formattedDate =
-        DateFormat('yyyy/MM/dd – HH:mm:ss').format(history.date);
-
     return GestureDetector(
       onTap: () => context.push(
           '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.createQRCode.id}'),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
         color: const Color(0xff444444),
-        // Slightly lighter background for list tile
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -191,9 +173,11 @@ class HistoryPage extends GetView<HomePageController> {
           title: Text(
             history.text,
             style: const TextStyle(color: Colors.white),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            formattedDate,
+            controller.convertToJalali(history.date),
             style: const TextStyle(color: Colors.grey),
           ),
           leading: history.photo != null
@@ -214,6 +198,4 @@ class HistoryPage extends GetView<HomePageController> {
       ),
     );
   }
-
-// Show a SnackBar with a message
 }

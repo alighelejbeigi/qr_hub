@@ -39,7 +39,6 @@ class MainPage extends GetView<HomePageController> {
         }),
       );
 
-  // Action Buttons Method (Gallery, Capture, Switch Camera, Flashlight)
   Widget _buildActionButtons(BuildContext context) {
     return Positioned(
       bottom: 30,
@@ -62,7 +61,6 @@ class MainPage extends GetView<HomePageController> {
     );
   }
 
-  // Gallery Button Method
   Widget _buildPickGalleryButton(BuildContext context) {
     return FloatingActionButton(
       heroTag: 'یک تصویر را از گالری انتخاب کنید',
@@ -72,7 +70,6 @@ class MainPage extends GetView<HomePageController> {
     );
   }
 
-  // Capture QR Code Button Method
   Widget _buildCaptureQRCodeButton(BuildContext context) {
     return FloatingActionButton(
       heroTag: 'از کد QR عکس بگیرید',
@@ -82,7 +79,6 @@ class MainPage extends GetView<HomePageController> {
     );
   }
 
-  // Switch Camera Button Method
   Widget _buildSwitchCameraButton() {
     return FloatingActionButton(
       heroTag: 'دوربین را عوض کنید',
@@ -92,7 +88,6 @@ class MainPage extends GetView<HomePageController> {
     );
   }
 
-  // Flashlight Button Method
   Widget _buildFlashlightButton() {
     return Obx(() => FloatingActionButton(
           heroTag: 'چراغ قوه را روشن کنید',

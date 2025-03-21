@@ -10,27 +10,29 @@ class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xff868686),
-        appBar: _buildAppBar(context),
-        body: Obx(()=>_mainBody()),
-        bottomNavigationBar: _buildBottomNavigationBar(context),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: _buildFloatingButton(),
+  Widget build(BuildContext context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: Scaffold(
+          backgroundColor: const Color(0xff868686),
+          appBar: _buildAppBar(context),
+          body: Obx(() => _mainBody()),
+          bottomNavigationBar: _buildBottomNavigationBar(context),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: _buildFloatingButton(),
+        ),
       );
 
   Widget _mainBody() {
-
     if (controller.selectedIndex.value == 2) {
-      return MainPage();
+      return const MainPage();
     } else if (controller.selectedIndex.value == 0) {
-      return HistoryPage();
+      return const HistoryPage();
     } else {
-      return GeneratePage();
+      return const GeneratePage();
     }
   }
 
-  // AppBar Method
   AppBar _buildAppBar(BuildContext context) => AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: const Color(0xffFDB624),
@@ -50,7 +52,6 @@ class HomePage extends GetView<HomePageController> {
         ],
       );
 
-  // Bottom Navigation Bar Method
   Widget _buildBottomNavigationBar(BuildContext context) => BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
@@ -83,7 +84,6 @@ class HomePage extends GetView<HomePageController> {
         ),
       );
 
-  // Bottom Bar Button Method
   Widget _buildBottomBarButton({
     required BuildContext context,
     required String label,
@@ -121,7 +121,6 @@ class HomePage extends GetView<HomePageController> {
     );
   }
 
-  // Floating Button Method
   Widget _buildFloatingButton() {
     return FloatingActionButton(
       onPressed: () {

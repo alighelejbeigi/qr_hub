@@ -1,22 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
 import '../controller/details_controller.dart';
 
 class DetailsPage extends GetView<DetailsController> {
   const DetailsPage({super.key});
 
   @override
-  Widget build(BuildContext context) => PopScope(
-        onPopInvokedWithResult: _handleOnPop,
-        child: Scaffold(
-          backgroundColor: const Color(0xff606060),
-          appBar: _buildAppBar(),
-          body: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Obx(
-              () => controller.isLoading.value
-                  ? const Center(child: CircularProgressIndicator())
-                  : _buildContent(),
+  Widget build(BuildContext context) => Directionality(
+        textDirection: TextDirection.rtl,
+        child: PopScope(
+          onPopInvokedWithResult: _handleOnPop,
+          child: Scaffold(
+            backgroundColor: const Color(0xff606060),
+            appBar: _buildAppBar(),
+            body: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Obx(
+                () => controller.isLoading.value
+                    ? const Center(child: CircularProgressIndicator())
+                    : _buildContent(),
+              ),
             ),
           ),
         ),
@@ -78,10 +82,6 @@ class DetailsPage extends GetView<DetailsController> {
           ),
           const SizedBox(height: 8.0),
           clickableResultText(qrCodeData),
-          /*Text(
-            qrCodeData,
-            style: const TextStyle(fontSize: 16),
-          ),*/
         ],
       ),
     );

@@ -19,7 +19,6 @@ class GeneratePage extends GetView<HomePageController> {
                   children: [
                     _buildTextField(),
                     const SizedBox(height: 24),
-
                     _buildGenerateQRCodeButton(),
                     const SizedBox(height: 24),
                     Row(
@@ -45,9 +44,7 @@ class GeneratePage extends GetView<HomePageController> {
                         )
                       ],
                     ),
-
                     const SizedBox(height: 24),
-                    // Save and Share Buttons
                     Obx(
                       () => controller.imageBytes.value != null
                           ? _buildSaveAndShareButtons()
@@ -132,10 +129,23 @@ class GeneratePage extends GetView<HomePageController> {
           Get.forceAppUpdate();
         },
         decoration: InputDecoration(
-          labelText: 'متن خود را برای ساخت کد QR وارد کنید',
-          labelStyle: TextStyle(
-            color: Colors.grey[600],
-            fontWeight: FontWeight.bold,
+          label: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                'متن خود را برای ساخت کد QR وارد کنید',
+                style: TextStyle(
+                  backgroundColor: Colors.white,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ),
           ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
@@ -148,7 +158,6 @@ class GeneratePage extends GetView<HomePageController> {
     );
   }
 
-  // Button to generate the QR Code
   Widget _buildGenerateQRCodeButton() {
     return ElevatedButton(
       onPressed: controller.textController.text.isNotEmpty
@@ -156,7 +165,6 @@ class GeneratePage extends GetView<HomePageController> {
           : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xffFDB624),
-        // Primary color for the button
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

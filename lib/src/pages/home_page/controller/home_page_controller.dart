@@ -10,13 +10,11 @@ import 'package:get/get.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shamsi_date/shamsi_date.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
-import '../view/widget/generate_page.dart';
-import '../view/widget/history_page.dart';
-import '../view/widget/main_page.dart';
 
 class HomePageController extends GetxController {
   final TextEditingController textController = TextEditingController();
@@ -28,7 +26,7 @@ class HomePageController extends GetxController {
   Rx<CameraController?> cameraController = Rx<CameraController?>(null);
   late List<CameraDescription> cameras;
 
-  //RxString qrCodeResult = ''.obs;
+  RxBool isFocused = false.obs;
   RxBool isCameraReady = false.obs;
   RxBool isFlashSupported = false.obs;
   RxBool isLoading = false.obs;
@@ -58,10 +56,14 @@ class HomePageController extends GetxController {
     selectedIndex.value = index;
   }
 
+  String convertToJalali(DateTime date) {
+    final jalali = Jalali.fromDateTime(date);
+    return '${jalali.year}/${jalali.month}/${jalali.day} - ${date.hour}:${date.minute}';
+  }
+
   Future<void> initializeCamera() async {
     try {
       final cameraPermission = await Permission.camera.request();
-      var status = await Permission.storage.request();
 
       if (!cameraPermission.isGranted) {
         _showFaildSnackBar(
@@ -116,7 +118,6 @@ class HomePageController extends GetxController {
         camera,
         ResolutionPreset.medium,
         enableAudio: false,
-
       );
 
       cameraController.value = newController;
@@ -405,7 +406,7 @@ class HomePageController extends GetxController {
                 getAllHistory();
                 generateQRCode();
                 _showSuccesSnackBar('همه QR کد ها پاک شد');
-               Get.forceAppUpdate();
+                Get.forceAppUpdate();
                 Navigator.of(context).pop();
               },
               child: const Text('حذف'),
