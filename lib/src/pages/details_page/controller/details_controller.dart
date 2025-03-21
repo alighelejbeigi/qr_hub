@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:easy_qr_code/easy_qr_code.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
@@ -11,6 +10,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../qr_hub.dart';
+import '../../../utils/constants.dart';
 
 class DetailsController extends GetxController {
   DetailsController({
@@ -54,7 +54,7 @@ class DetailsController extends GetxController {
     try {
       var status = await Permission.storage.request();
       if (!status.isGranted) {
-        _showFaildSnackBar('مجوز ذخیره سازی رد شد');
+        _showFailedSnackBar('مجوز ذخیره سازی رد شد');
         return;
       }
       final customDir = Directory('/storage/emulated/0/Download');
@@ -65,9 +65,9 @@ class DetailsController extends GetxController {
       } else {
         await file.writeAsBytes(itemScan!.photo!);
       }
-      _showSuccesSnackBar('در دانلود ها ذخیره شد');
+      _showSuccessSnackBar('در دانلود ها ذخیره شد');
     } catch (e) {
-      _showFaildSnackBar('خطا در ذخیره فایل');
+      _showFailedSnackBar('خطا در ذخیره فایل');
     }
   }
 
@@ -77,28 +77,28 @@ class DetailsController extends GetxController {
     } else {
       Clipboard.setData(ClipboardData(text: itemScan!.text));
     }
-    _showSuccesSnackBar('متن کپی شد.');
+    _showSuccessSnackBar('متن کپی شد.');
   }
 
-  void _showFaildSnackBar(String message) {
+  void _showFailedSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
+        backgroundColor: kDangerColor,
+        textColor: kTextColor,
         fontSize: 16.0);
   }
 
-  void _showSuccesSnackBar(String message) {
+  void _showSuccessSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
+        backgroundColor: kSecondaryColor,
+        textColor: kTextColor,
         fontSize: 16.0);
   }
 

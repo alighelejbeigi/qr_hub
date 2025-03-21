@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+
+import '../../../utils/constants.dart';
 import '../controller/splash_controller.dart';
 
 class SplashScreen extends GetView<SplashController> {
@@ -46,7 +48,7 @@ class SplashScreen extends GetView<SplashController> {
           child: Text(
             'Qr Hub',
             style: TextStyle(
-              color: Colors.white,
+              color: kTextColor,
               fontSize: 40,
               fontWeight: FontWeight.bold,
             ),
@@ -60,9 +62,9 @@ class SplashScreen extends GetView<SplashController> {
         right: 0,
         child: const Center(
           child: Text(
-            'version 1.1',
+            'version 1.1.0',
             style: TextStyle(
-              color: Colors.white,
+              color: kTextColor,
               fontSize: 16,
               fontWeight: FontWeight.bold,
             ),

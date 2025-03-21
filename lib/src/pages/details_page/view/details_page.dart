@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../utils/constants.dart';
 import '../controller/details_controller.dart';
 
 class DetailsPage extends GetView<DetailsController> {
@@ -12,7 +13,7 @@ class DetailsPage extends GetView<DetailsController> {
         child: PopScope(
           onPopInvokedWithResult: _handleOnPop,
           child: Scaffold(
-            backgroundColor: const Color(0xff606060),
+            backgroundColor: kBackgroundColor,
             appBar: _buildAppBar(),
             body: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -33,7 +34,7 @@ class DetailsPage extends GetView<DetailsController> {
 
   AppBar _buildAppBar() {
     return AppBar(
-      backgroundColor: const Color(0xffFDB624),
+      backgroundColor: kPrimaryColor,
       title: const Text('جزئیات کد QR'),
     );
   }
@@ -93,7 +94,7 @@ class DetailsPage extends GetView<DetailsController> {
       child: Text(
         result,
         style: TextStyle(
-            color: isValidUrls ? Colors.blue : Colors.black,
+            color: isValidUrls ? kLinkTextColor : Colors.black,
             decoration:
                 isValidUrls ? TextDecoration.underline : TextDecoration.none,
             fontSize: 16),
@@ -159,7 +160,7 @@ class DetailsPage extends GetView<DetailsController> {
       icon: Icon(icon),
       label: Text(label),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffFDB624),
+        backgroundColor: kPrimaryColor,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
@@ -170,7 +171,7 @@ class DetailsPage extends GetView<DetailsController> {
 
   BoxDecoration _containerDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: kTextColor,
       borderRadius: BorderRadius.circular(12.0),
       boxShadow: [
         BoxShadow(

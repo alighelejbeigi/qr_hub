@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_hub/src/pages/home_page/view/widget/history_page.dart';
 
+import '../../../utils/constants.dart';
 import '../controller/home_page_controller.dart';
 import 'widget/generate_page.dart';
 import 'widget/main_page.dart';
@@ -13,7 +14,7 @@ class HomePage extends GetView<HomePageController> {
   Widget build(BuildContext context) => Directionality(
         textDirection: TextDirection.rtl,
         child: Scaffold(
-          backgroundColor: const Color(0xff868686),
+          backgroundColor: kBackgroundColor,
           appBar: _buildAppBar(context),
           body: Obx(() => _mainBody()),
           bottomNavigationBar: _buildBottomNavigationBar(context),
@@ -35,7 +36,7 @@ class HomePage extends GetView<HomePageController> {
 
   AppBar _buildAppBar(BuildContext context) => AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: const Color(0xffFDB624),
+        backgroundColor: kPrimaryColor,
         title: Obx(() => controller.titles[controller.selectedIndex.value]),
         actions: [
           /*  IconButton(
@@ -55,7 +56,7 @@ class HomePage extends GetView<HomePageController> {
   Widget _buildBottomNavigationBar(BuildContext context) => BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 8,
-        color: const Color(0xff333333),
+        color: kSecondaryColor,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -98,7 +99,7 @@ class HomePage extends GetView<HomePageController> {
         decoration: BoxDecoration(
           border: isSelected
               ? const Border(
-                  bottom: BorderSide(color: Color(0xffFDB624), width: 2),
+                  bottom: BorderSide(color: kPrimaryColor, width: 2),
                 )
               : null,
         ),
@@ -107,12 +108,12 @@ class HomePage extends GetView<HomePageController> {
           children: [
             Icon(
               icon,
-              color: isSelected ? const Color(0xffFDB624) : Colors.white,
+              color: isSelected ? kPrimaryColor : kTextColor,
             ),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? const Color(0xffFDB624) : Colors.white,
+                color: isSelected ? kPrimaryColor : kTextColor,
               ),
             ),
           ],
@@ -127,7 +128,7 @@ class HomePage extends GetView<HomePageController> {
         Get.forceAppUpdate();
         controller.onTabTapped(2);
       },
-      backgroundColor: const Color(0xffFDB624),
+      backgroundColor: kPrimaryColor,
       shape: const CircleBorder(),
       elevation: 4,
       child: Image.asset(

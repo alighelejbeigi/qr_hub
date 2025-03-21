@@ -32,7 +32,7 @@ class DeleteDialog extends GetView<HomePageController> {
               }
               if (!context.mounted) return;
 
-              controller.showSuccesSnackBar("مورد انتخابی حذف شد");
+              controller.showSuccessSnackBar("مورد انتخابی حذف شد");
               Get.forceAppUpdate();
               Navigator.of(context).pop();
             },

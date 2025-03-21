@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qr_hub/src/pages/home_page/controller/home_page_controller.dart';
 
+import '../../../../utils/constants.dart';
+
 class GeneratePage extends GetView<HomePageController> {
   const GeneratePage({super.key});
 
   @override
   Widget build(BuildContext context) => Center(
         child: Container(
-          color: const Color(0xff868686),
+          color: kBackgroundColor,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Center(
@@ -62,7 +64,7 @@ class GeneratePage extends GetView<HomePageController> {
 
   BoxDecoration _containerDecoration() {
     return BoxDecoration(
-      color: Colors.white,
+      color: kTextColor,
       borderRadius: BorderRadius.circular(12.0),
       boxShadow: [
         BoxShadow(
@@ -103,7 +105,7 @@ class GeneratePage extends GetView<HomePageController> {
       icon: Icon(icon),
       label: Text(label),
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffFDB624),
+        backgroundColor: kPrimaryColor,
         padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8.0),
@@ -115,7 +117,7 @@ class GeneratePage extends GetView<HomePageController> {
   Widget _buildTextField() {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: kTextColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -133,16 +135,16 @@ class GeneratePage extends GetView<HomePageController> {
         decoration: InputDecoration(
           label: DecoratedBox(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: kTextColor,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
+            child: const Padding(
+              padding: EdgeInsets.all(8.0),
               child: Text(
                 'متن خود را برای ساخت کد QR وارد کنید',
                 style: TextStyle(
-                  backgroundColor: Colors.white,
-                  color: Colors.grey[600],
+                  backgroundColor: kTextColor,
+                  color: kCaptionColor,
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
                 ),
@@ -154,7 +156,7 @@ class GeneratePage extends GetView<HomePageController> {
             borderSide: BorderSide.none,
           ),
           filled: true,
-          fillColor: Colors.white,
+          fillColor: kTextColor,
         ),
       ),
     );
@@ -166,7 +168,7 @@ class GeneratePage extends GetView<HomePageController> {
           ? () => controller.generateQRHelper.generateQRCode()
           : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xffFDB624),
+        backgroundColor: kPrimaryColor,
         padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),

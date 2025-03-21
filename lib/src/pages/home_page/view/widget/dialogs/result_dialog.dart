@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/simple/get_view.dart';
 
+import '../../../../../utils/constants.dart';
 import '../../../controller/home_page_controller.dart';
 
 class ResultDialog extends GetView<HomePageController> {
@@ -16,7 +17,7 @@ class ResultDialog extends GetView<HomePageController> {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15),
         ),
-        backgroundColor: const Color(0xffFDB624),
+        backgroundColor: kPrimaryColor,
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -24,14 +25,14 @@ class ResultDialog extends GetView<HomePageController> {
             const Icon(
               Icons.qr_code_2,
               size: 50,
-              color: Colors.white,
+              color: kTextColor,
             ),
             const SizedBox(height: 10),
             const Text(
               'نتیجه اسکن',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white,
+                color: kTextColor,
               ),
               textAlign: TextAlign.center,
             ),
@@ -40,7 +41,7 @@ class ResultDialog extends GetView<HomePageController> {
             ElevatedButton(
               onPressed: () => Navigator.of(context).pop(),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
+                backgroundColor: kTextColor,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
@@ -48,7 +49,7 @@ class ResultDialog extends GetView<HomePageController> {
               child: const Text(
                 'باشه',
                 style: TextStyle(
-                  color: Color(0xffFDB624),
+                  color: kPrimaryColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -68,7 +69,7 @@ class ResultDialog extends GetView<HomePageController> {
       child: Text(
         result,
         style: TextStyle(
-          color: isValidUrls ? Colors.blue : Colors.white,
+          color: isValidUrls ? kLinkTextColor : kTextColor,
           decoration:
               isValidUrls ? TextDecoration.underline : TextDecoration.none,
         ),

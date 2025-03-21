@@ -56,7 +56,7 @@ class GenerateQRHelper {
     try {
       var status = await Permission.storage.request();
       if (!status.isGranted) {
-        controller.showFaildSnackBar('مجوز ذخیره سازی رد شد');
+        controller.showFailedSnackBar('مجوز ذخیره سازی رد شد');
         return;
       }
       final customDir = Directory('/storage/emulated/0/Download');
@@ -64,9 +64,9 @@ class GenerateQRHelper {
           '${customDir.path}/easyQrCode_${controller.uuid.v4()}.png';
       final file = File(filePath);
       await file.writeAsBytes(imageBytes.value!);
-      controller.showSuccesSnackBar('در دانلود ها ذخیره شد');
+      controller.showSuccessSnackBar('در دانلود ها ذخیره شد');
     } catch (e) {
-      controller.showFaildSnackBar('خطا در ذخیره فایل');
+      controller.showFailedSnackBar('خطا در ذخیره فایل');
     }
   }
 

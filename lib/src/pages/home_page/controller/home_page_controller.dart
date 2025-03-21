@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../utils/constants.dart';
 import '../view/widget/dialogs/delete_all_dialog.dart';
 import '../view/widget/dialogs/delete_dialog.dart';
 import '../view/widget/dialogs/result_dialog.dart';
@@ -55,7 +56,8 @@ class HomePageController extends GetxController {
     try {
       final cameraPermission = await Permission.camera.request();
       if (!cameraPermission.isGranted) {
-        showFaildSnackBar('دسترسی به دوربین لازم است تا این عملیات انجام شود.');
+        showFailedSnackBar(
+            'دسترسی به دوربین لازم است تا این عملیات انجام شود.');
         return;
       }
 
@@ -63,7 +65,7 @@ class HomePageController extends GetxController {
       if (cameras.isNotEmpty) {
         await _setupCameraController(cameras[selectedCameraIndex.value]);
       } else {
-        showFaildSnackBar('دوربینی در دسترس نیست.');
+        showFailedSnackBar('دوربینی در دسترس نیست.');
       }
     } catch (e) {
       handleError(e);
@@ -73,7 +75,7 @@ class HomePageController extends GetxController {
   Future<void> toggleFlash() async {
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      showFaildSnackBar('دوربین آماده نیست.');
+      showFailedSnackBar('دوربین آماده نیست.');
 
       return;
     }
@@ -87,10 +89,10 @@ class HomePageController extends GetxController {
           isFlashOn.value ? FlashMode.torch : FlashMode.off,
         );
       } else {
-        showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+        showFailedSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
       }
     } catch (e) {
-      showFaildSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
+      showFailedSnackBar('این دستگاه از فلاش پشتیبانی نمی‌کند.');
     }
   }
 
@@ -156,7 +158,7 @@ class HomePageController extends GetxController {
     isLoading.value = true;
     if (cameraController.value == null ||
         !cameraController.value!.value.isInitialized) {
-      showFaildSnackBar('دوربین آماده نیست.');
+      showFailedSnackBar('دوربین آماده نیست.');
       return;
     }
     try {
@@ -170,11 +172,11 @@ class HomePageController extends GetxController {
         showResultDialog(context, decodedResult);
         isLoading.value = false;
       } else {
-        showFaildSnackBar(' کد QR یافت نشد');
+        showFailedSnackBar(' کد QR یافت نشد');
         isLoading.value = false;
       }
     } catch (e) {
-      showFaildSnackBar('خطا در اسکن کد QR: $e');
+      showFailedSnackBar('خطا در اسکن کد QR: $e');
       isLoading.value = false;
     }
   }
@@ -194,15 +196,15 @@ class HomePageController extends GetxController {
           showResultDialog(context, decodedResult);
           isLoading.value = false;
         } else {
-          showFaildSnackBar('کد QR یافت نشد');
+          showFailedSnackBar('کد QR یافت نشد');
           isLoading.value = false;
         }
       } else {
-        showFaildSnackBar('تصویری انتخاب نشد.');
+        showFailedSnackBar('تصویری انتخاب نشد.');
         isLoading.value = false;
       }
     } catch (e) {
-      showFaildSnackBar('خطا در انتخاب تصویر: $e');
+      showFailedSnackBar('خطا در انتخاب تصویر: $e');
       isLoading.value = false;
     }
   }
@@ -216,7 +218,7 @@ class HomePageController extends GetxController {
       isSwitchCamera = true;
       isCameraReady.value = false;
 
-      showFaildSnackBar('در حال تغییر دوربین...');
+      showFailedSnackBar('در حال تغییر دوربین...');
       try {
         selectedCameraIndex.value =
             (selectedCameraIndex.value + 1) % cameras.length;
@@ -225,12 +227,12 @@ class HomePageController extends GetxController {
         handleError(e);
       } finally {
         isCameraReady.value = true;
-        showFaildSnackBar('');
+        showFailedSnackBar('');
 
         isSwitchCamera = false;
       }
     } else {
-      showFaildSnackBar('فقط یک دوربین در دسترس است.');
+      showFailedSnackBar('فقط یک دوربین در دسترس است.');
     }
   }
 
@@ -251,29 +253,29 @@ class HomePageController extends GetxController {
     );
   }
 
-  void showFaildSnackBar(String message) {
+  void showFailedSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
+        backgroundColor: kDangerColor,
+        textColor: kTextColor,
         fontSize: 16.0);
   }
 
-  void showSuccesSnackBar(String message) {
+  void showSuccessSnackBar(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 1,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
+        backgroundColor: kSuccessColor,
+        textColor: kTextColor,
         fontSize: 16.0);
   }
 
   void handleError(dynamic e) {
-    showFaildSnackBar('خطایی رخ داده است: $e');
+    showFailedSnackBar('خطایی رخ داده است: $e');
   }
 }

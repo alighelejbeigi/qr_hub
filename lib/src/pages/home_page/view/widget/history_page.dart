@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
+import 'package:qr_hub/src/utils/constants.dart';
 
 import '../../../../../qr_hub.dart';
 import '../../../shared/enum/qr_code_enum.dart';
@@ -19,7 +20,7 @@ class HistoryPage extends GetView<HomePageController> {
             const SizedBox(height: 16),
             Container(
               decoration: BoxDecoration(
-                color: const Color(0xff333333),
+                color: kSecondaryColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -28,8 +29,8 @@ class HistoryPage extends GetView<HomePageController> {
                 child: TabBar(
                   labelStyle:
                       TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                  labelColor: Color(0xffFDB624),
-                  unselectedLabelColor: Colors.white,
+                  labelColor: kPrimaryColor,
+                  unselectedLabelColor: kTextColor,
                   indicator: BoxDecoration(),
                   dividerHeight: 0,
                   tabs: [
@@ -120,7 +121,7 @@ class HistoryPage extends GetView<HomePageController> {
           '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.scanQRCode.id}'),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        color: const Color(0xff444444),
+        color: kSecondaryColor.withValues(alpha: 0.7),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -128,13 +129,13 @@ class HistoryPage extends GetView<HomePageController> {
           contentPadding: const EdgeInsets.all(12),
           title: Text(
             history.text,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: kTextColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
             controller.historyQrHelper.convertToJalali(history.date),
-            style: const TextStyle(color: Colors.grey),
+            style: const TextStyle(color: kCaptionColor),
           ),
           leading: history.photo != null
               ? ClipRRect(
@@ -144,10 +145,10 @@ class HistoryPage extends GetView<HomePageController> {
                 )
               : const Icon(
                   Icons.image,
-                  color: Colors.white,
+                  color: kTextColor,
                 ),
           trailing: IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete, color: kDangerColor),
             onPressed: onDelete,
           ),
         ),
@@ -165,7 +166,7 @@ class HistoryPage extends GetView<HomePageController> {
           '${RouteNames.detailsPage}/${history.id}/${QRCodeAction.createQRCode.id}'),
       child: Card(
         margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        color: const Color(0xff444444),
+        color: kSecondaryColor.withValues(alpha: 0.7),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
@@ -173,13 +174,13 @@ class HistoryPage extends GetView<HomePageController> {
           contentPadding: const EdgeInsets.all(12),
           title: Text(
             history.text,
-            style: const TextStyle(color: Colors.white),
+            style: const TextStyle(color: kTextColor),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
             controller.historyQrHelper.convertToJalali(history.date),
-            style: const TextStyle(color: Colors.grey),
+            style: const TextStyle(color: kCaptionColor),
           ),
           leading: history.photo != null
               ? ClipRRect(
@@ -189,10 +190,10 @@ class HistoryPage extends GetView<HomePageController> {
                 )
               : const Icon(
                   Icons.image,
-                  color: Colors.white,
+                  color: kTextColor,
                 ),
           trailing: IconButton(
-            icon: const Icon(Icons.delete, color: Colors.red),
+            icon: const Icon(Icons.delete, color: kDangerColor),
             onPressed: onDelete,
           ),
         ),

@@ -22,7 +22,7 @@ class DeleteAllDialog extends GetView<HomePageController> {
               if (!context.mounted) return;
               // getAllHistory();
               //generateQRCode();
-              controller.showSuccesSnackBar('همه QR کد ها پاک شد');
+              controller.showSuccessSnackBar('همه QR کد ها پاک شد');
               Get.forceAppUpdate();
               Navigator.of(context).pop();
             },

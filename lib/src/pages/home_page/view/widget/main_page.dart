@@ -1,6 +1,7 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:qr_hub/src/utils/constants.dart';
 
 import '../../controller/home_page_controller.dart';
 import 'clipper_for_camera_preview.dart';
@@ -32,7 +33,7 @@ class MainPage extends GetView<HomePageController> {
           } else {
             return const Center(
               child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(Color(0xffFDB624)),
+                valueColor: AlwaysStoppedAnimation(kPrimaryColor),
               ),
             );
           }
@@ -64,41 +65,40 @@ class MainPage extends GetView<HomePageController> {
   Widget _buildPickGalleryButton(BuildContext context) {
     return FloatingActionButton(
       heroTag: 'یک تصویر را از گالری انتخاب کنید',
-      backgroundColor: const Color(0xffFDB624),
+      backgroundColor: kPrimaryColor,
       onPressed: () => controller.pickImageFromGallery(context),
-      child: const Icon(Icons.image, color: Colors.white),
+      child: const Icon(Icons.image, color: kTextColor),
     );
   }
 
   Widget _buildCaptureQRCodeButton(BuildContext context) {
     return FloatingActionButton(
       heroTag: 'از کد QR عکس بگیرید',
-      backgroundColor: const Color(0xffFDB624),
+      backgroundColor: kPrimaryColor,
       onPressed: () => controller.captureAndDecodeQRCode(context),
-      child: const Icon(Icons.camera_alt, color: Colors.white),
+      child: const Icon(Icons.camera_alt, color: kTextColor),
     );
   }
 
   Widget _buildSwitchCameraButton() {
     return FloatingActionButton(
       heroTag: 'دوربین را عوض کنید',
-      backgroundColor: const Color(0xffFDB624),
+      backgroundColor: kPrimaryColor,
       onPressed: controller.switchCamera,
-      child: const Icon(Icons.switch_camera, color: Colors.white),
+      child: const Icon(Icons.switch_camera, color: kTextColor),
     );
   }
 
   Widget _buildFlashlightButton() {
     return Obx(() => FloatingActionButton(
           heroTag: 'چراغ قوه را روشن کنید',
-          backgroundColor: controller.isFlashSupported.value
-              ? const Color(0xffFDB624)
-              : const Color(0xffb6b6b3),
+          backgroundColor:
+              controller.isFlashSupported.value ? kPrimaryColor : kTextColor,
           onPressed:
               controller.isFlashSupported.value ? controller.toggleFlash : null,
           child: Icon(
             controller.isFlashOn.value ? Icons.flash_off : Icons.flash_on,
-            color: Colors.white,
+            color: kTextColor,
           ),
         ));
   }
